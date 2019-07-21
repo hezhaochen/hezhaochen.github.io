@@ -15,14 +15,18 @@
 
 
 
+<meta name="description" content="##简介正式开始学习heap的第一天，简单的在自己的博客里记录一下，当做自己的学习笔记。1)在linux的堆学习中，我们主要学习的就是malloc，relloc和free三个函数。2)要知道：    有哪些位置的记忆体是可以被分配的    有哪些是因为被free掉而可以被回收的    有哪些是使用中不需要记录，使用他们的人应该记住这些指标（heap本身并不会记录）3)整个heap的资料记录在一个s">
+<meta name="keywords" content="heap">
 <meta property="og:type" content="article">
 <meta property="og:title" content="heap-1">
 <meta property="og:url" content="http://yoursite.com/2019/07/21/heap-1/index.html">
 <meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="##简介正式开始学习heap的第一天，简单的在自己的博客里记录一下，当做自己的学习笔记。1)在linux的堆学习中，我们主要学习的就是malloc，relloc和free三个函数。2)要知道：    有哪些位置的记忆体是可以被分配的    有哪些是因为被free掉而可以被回收的    有哪些是使用中不需要记录，使用他们的人应该记住这些指标（heap本身并不会记录）3)整个heap的资料记录在一个s">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-07-21T11:28:21.597Z">
+<meta property="og:updated_time" content="2019-07-21T12:26:21.061Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="heap-1">
+<meta name="twitter:description" content="##简介正式开始学习heap的第一天，简单的在自己的博客里记录一下，当做自己的学习笔记。1)在linux的堆学习中，我们主要学习的就是malloc，relloc和free三个函数。2)要知道：    有哪些位置的记忆体是可以被分配的    有哪些是因为被free掉而可以被回收的    有哪些是使用中不需要记录，使用他们的人应该记住这些指标（heap本身并不会记录）3)整个heap的资料记录在一个s">
 
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
@@ -179,7 +183,7 @@
                 
                 <section class="switch-part switch-part2">
                     <div class="widget tagcloud" id="js-tagcloud">
-                        <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/大事/">大事</a></li></ul>
+                        <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/heap/">heap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/大事/">大事</a></li></ul>
                     </div>
                 </section>
                 
@@ -283,6 +287,10 @@
         
 
         
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/heap/">heap</a></li></ul>
+    </div>
+
         <div class="clearfix"></div>
       </div>
       
@@ -290,7 +298,10 @@
     <div class="article-entry" itemprop="articleBody">
       
           
-        
+        <p>##简介<br>正式开始学习heap的第一天，简单的在自己的博客里记录一下，当做自己的学习笔记。<br>1)在linux的堆学习中，我们主要学习的就是malloc，relloc和free三个函数。<br>2)要知道：<br>    有哪些位置的记忆体是可以被分配的<br>    有哪些是因为被free掉而可以被回收的<br>    有哪些是使用中不需要记录，使用他们的人应该记住这些指标（heap本身并不会记录）<br>3)整个heap的资料记录在一个struct malloc_state中，名为main_arena<br>  malloc分配的记忆体名为chunk，会比要求的大小要大一点，因为需要记录一些额外的data<br>  Arena跟heap分配的记忆体分开存放，heap overflow没办法直接覆盖掉他的内容</p>
+<hr>
+<p>##基本内容<br>然后我们可以自己编写一个heap.c来看heap的操作会发生什么事情。</p>
+
       
     </div>
     
@@ -301,7 +312,7 @@
         <p><span>本文标题:</span><a href="/2019/07/21/heap-1/">heap-1</a></p>
         <p><span>文章作者:</span><a href="/" title="回到主页">HeZhaochen</a></p>
         <p><span>发布时间:</span>2019-07-21, 19:28:21</p>
-        <p><span>最后更新:</span>2019-07-21, 19:28:21</p>
+        <p><span>最后更新:</span>2019-07-21, 20:26:21</p>
         <p>
             <span>原始链接:</span><a class="post-url" href="/2019/07/21/heap-1/" title="heap-1">http://yoursite.com/2019/07/21/heap-1/</a>
             <span class="copy-path" data-clipboard-text="原文: http://yoursite.com/2019/07/21/heap-1/　　作者: HeZhaochen" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
