@@ -15,18 +15,18 @@
 
 
 
-<meta name="description" content="简介正式开始学习heap的第一天，简单的在自己的博客里记录一下，当做自己的学习笔记。1)在linux的堆学习中，我们主要学习的就是malloc，relloc和free三个函数。2)要知道：    有哪些位置的记忆体是可以被分配的    有哪些是因为被free掉而可以被回收的    有哪些是使用中不需要记录，使用他们的人应该记住这些指标（heap本身并不会记录）3)整个heap的资料记录在一个str">
+<meta name="description" content="简介正式开始学习heap的第一天，简单的在自己的博客里记录一下，当做自己的学习笔记。  在linux的堆学习中，我们主要学习的就是malloc，relloc和free三个函数。 要知道：  有哪些位置的记忆体是可以被分配的  有哪些是因为被free掉而可以被回收的  有哪些是使用中不需要记录，使用他们的人应该记住这些指标（heap本身并不会记录） 整个heap的资料记录在一个struct mall">
 <meta name="keywords" content="heap">
 <meta property="og:type" content="article">
 <meta property="og:title" content="heap-1">
 <meta property="og:url" content="http://yoursite.com/2019/07/21/heap-1/index.html">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="简介正式开始学习heap的第一天，简单的在自己的博客里记录一下，当做自己的学习笔记。1)在linux的堆学习中，我们主要学习的就是malloc，relloc和free三个函数。2)要知道：    有哪些位置的记忆体是可以被分配的    有哪些是因为被free掉而可以被回收的    有哪些是使用中不需要记录，使用他们的人应该记住这些指标（heap本身并不会记录）3)整个heap的资料记录在一个str">
+<meta property="og:description" content="简介正式开始学习heap的第一天，简单的在自己的博客里记录一下，当做自己的学习笔记。  在linux的堆学习中，我们主要学习的就是malloc，relloc和free三个函数。 要知道：  有哪些位置的记忆体是可以被分配的  有哪些是因为被free掉而可以被回收的  有哪些是使用中不需要记录，使用他们的人应该记住这些指标（heap本身并不会记录） 整个heap的资料记录在一个struct mall">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-07-21T12:27:26.108Z">
+<meta property="og:updated_time" content="2019-07-21T14:12:49.663Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="heap-1">
-<meta name="twitter:description" content="简介正式开始学习heap的第一天，简单的在自己的博客里记录一下，当做自己的学习笔记。1)在linux的堆学习中，我们主要学习的就是malloc，relloc和free三个函数。2)要知道：    有哪些位置的记忆体是可以被分配的    有哪些是因为被free掉而可以被回收的    有哪些是使用中不需要记录，使用他们的人应该记住这些指标（heap本身并不会记录）3)整个heap的资料记录在一个str">
+<meta name="twitter:description" content="简介正式开始学习heap的第一天，简单的在自己的博客里记录一下，当做自己的学习笔记。  在linux的堆学习中，我们主要学习的就是malloc，relloc和free三个函数。 要知道：  有哪些位置的记忆体是可以被分配的  有哪些是因为被free掉而可以被回收的  有哪些是使用中不需要记录，使用他们的人应该记住这些指标（heap本身并不会记录） 整个heap的资料记录在一个struct mall">
 
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
@@ -298,9 +298,33 @@
     <div class="article-entry" itemprop="articleBody">
       
           
-        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>正式开始学习heap的第一天，简单的在自己的博客里记录一下，当做自己的学习笔记。<br>1)在linux的堆学习中，我们主要学习的就是malloc，relloc和free三个函数。<br>2)要知道：<br>    有哪些位置的记忆体是可以被分配的<br>    有哪些是因为被free掉而可以被回收的<br>    有哪些是使用中不需要记录，使用他们的人应该记住这些指标（heap本身并不会记录）<br>3)整个heap的资料记录在一个struct malloc_state中，名为main_arena<br>  malloc分配的记忆体名为chunk，会比要求的大小要大一点，因为需要记录一些额外的data<br>  Arena跟heap分配的记忆体分开存放，heap overflow没办法直接覆盖掉他的内容</p>
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>正式开始学习heap的第一天，简单的在自己的博客里记录一下，当做自己的学习笔记。</p>
+<ul>
+<li>在linux的堆学习中，我们主要学习的就是malloc，relloc和free三个函数。</li>
+<li>要知道：<br>  有哪些位置的记忆体是可以被分配的<br>  有哪些是因为被free掉而可以被回收的<br>  有哪些是使用中不需要记录，使用他们的人应该记住这些指标（heap本身并不会记录）</li>
+<li>整个heap的资料记录在一个struct malloc_state中，名为main_arena<br>malloc分配的记忆体名为chunk，会比要求的大小要大一点，因为需要记录一些额外的data<br>Arena跟heap分配的记忆体分开存放，heap overflow没办法直接覆盖掉他的内容</li>
+<li>回收的chunk用linked list记录，名为bin</li>
+<li>main_arena中有很多bin，每个bin里储存的chunk size不同，目的是让malloc时可以尽快找到最适合大小的chunk</li>
+<li>回收的chunk会依据size来决定应该放哪个linked list(bin)中<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">main_arena&#123;</span><br><span class="line">	bin[0](size = 16) -&gt; chunk1 -&gt; chunk5</span><br><span class="line">	bin[1](size = 32) -&gt; chunk2 -&gt; chunk3 -&gt; chunk4</span><br><span class="line">	bin[2](size = 48) -&gt; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
 <hr>
-<h2 id="基本内容"><a href="#基本内容" class="headerlink" title="基本内容"></a>基本内容</h2><p>然后我们可以自己编写一个heap.c来看heap的操作会发生什么事情。</p>
+<h2 id="基本内容"><a href="#基本内容" class="headerlink" title="基本内容"></a>基本内容</h2><p>然后我们可以自己编写一个heap.c来看heap的操作会发生什么事情。<br>首先我们进入gdb进行调试，将断点断在main，跑起来，输入p main_arena 就可以看到：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">$1 = &#123;</span><br><span class="line">  mutex = 0x0, </span><br><span class="line">  flags = 0x0, </span><br><span class="line">  fastbinsY = &#123;0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0&#125;, </span><br><span class="line">  top = 0x0, </span><br><span class="line">  last_remainder = 0x0, </span><br><span class="line">  bins = &#123;0x0 &lt;repeats 254 times&gt;&#125;, </span><br><span class="line">  binmap = &#123;0x0, 0x0, 0x0, 0x0&#125;, </span><br><span class="line">  next = 0x7ffff7dd1b20 &lt;main_arena&gt;, </span><br><span class="line">  next_free = 0x0, </span><br><span class="line">  attached_threads = 0x1, </span><br><span class="line">  system_mem = 0x0, </span><br><span class="line">  max_system_mem = 0x0</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后，我们可以使用p main_arena.bins [0]命令来查看bin[0]的内容，同时通过vmmap命令可以看到，在本程序中heap的起始位置<br>在0x602000，使用x/40gx 0x602000就可以查看堆中的内容了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">0x602000:	0x0000000000000000	0x00000000000000a1</span><br><span class="line">0x602010:	0x0000000000000000	0x0000000000000000</span><br><span class="line">0x602020:	0x0000000000000000	0x0000000000000000</span><br><span class="line">0x602030:	0x0000000000000000	0x0000000000000000</span><br><span class="line">0x602040:	0x0000000000000000	0x0000000000000000</span><br><span class="line">0x602050:	0x0000000000000000	0x0000000000000000</span><br><span class="line">0x602060:	0x0000000000000000	0x0000000000000000</span><br><span class="line">0x602070:	0x0000000000000000	0x0000000000000000</span><br><span class="line">0x602080:	0x0000000000000000	0x0000000000000000</span><br><span class="line">0x602090:	0x0000000000000000	0x0000000000000000</span><br><span class="line">0x6020a0:	0x0000000000000000	0x00000000000000a1</span><br><span class="line">0x6020b0:	0x0000000000000000	0x0000000000000000</span><br><span class="line">0x6020c0:	0x0000000000000000	0x0000000000000000</span><br><span class="line">0x6020d0:	0x0000000000000000	0x0000000000000000</span><br><span class="line">0x6020e0:	0x0000000000000000	0x0000000000000000</span><br><span class="line">0x6020f0:	0x0000000000000000	0x0000000000000000</span><br><span class="line">0x602100:	0x0000000000000000	0x0000000000000000</span><br><span class="line">0x602110:	0x0000000000000000	0x0000000000000000</span><br><span class="line">0x602120:	0x0000000000000000	0x0000000000000000</span><br><span class="line">0x602130:	0x0000000000000000	0x0000000000000000</span><br></pre></td></tr></table></figure>
+
+<p>这就是两个chunk的内容，之后还会提到<strong>top chunk</strong>的内容，以后再学习吧。</p>
+<h2 id="chunk的知识"><a href="#chunk的知识" class="headerlink" title="chunk的知识"></a>chunk的知识</h2><p>存放chunk metadata的chunk结构(header):</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">struct malloc_chunk&#123;</span><br><span class="line">	size_t prev_size;</span><br><span class="line">	size_t size;</span><br><span class="line">	malloc_chunk* fd;</span><br><span class="line">	malloc_chunk* bk;</span><br><span class="line">	malloc_chunk* fd_nextsize;</span><br><span class="line">	malloc_chunk* bk_nextsize;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>(64bit):mem = malloc(size)<br>-&gt; chunk = mem - 16(32bit则是8);chunksize = (size+8)#16 </p>
+<ul>
+<li>实际chunk地址是malloc得到的地址减去16</li>
+<li>chunksize是size+8后向上对齐到16的倍数，因为要存放额外的资料</li>
+</ul>
 
       
     </div>
@@ -312,7 +336,7 @@
         <p><span>本文标题:</span><a href="/2019/07/21/heap-1/">heap-1</a></p>
         <p><span>文章作者:</span><a href="/" title="回到主页">HeZhaochen</a></p>
         <p><span>发布时间:</span>2019-07-21, 19:28:21</p>
-        <p><span>最后更新:</span>2019-07-21, 20:27:26</p>
+        <p><span>最后更新:</span>2019-07-21, 22:12:49</p>
         <p>
             <span>原始链接:</span><a class="post-url" href="/2019/07/21/heap-1/" title="heap-1">http://yoursite.com/2019/07/21/heap-1/</a>
             <span class="copy-path" data-clipboard-text="原文: http://yoursite.com/2019/07/21/heap-1/　　作者: HeZhaochen" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
@@ -342,7 +366,7 @@
     <div id="toc" class="toc-article">
         <strong class="toc-title">文章目录</strong>
         
-            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#简介"><span class="toc-number">1.</span> <span class="toc-text">简介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#基本内容"><span class="toc-number">2.</span> <span class="toc-text">基本内容</span></a></li></ol>
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#简介"><span class="toc-number">1.</span> <span class="toc-text">简介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#基本内容"><span class="toc-number">2.</span> <span class="toc-text">基本内容</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#chunk的知识"><span class="toc-number">3.</span> <span class="toc-text">chunk的知识</span></a></li></ol>
         
     </div>
     <style>
