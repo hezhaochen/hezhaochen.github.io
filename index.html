@@ -289,9 +289,9 @@
     <div class="article-entry" itemprop="articleBody">
       
           
-        <p>##简介<br>正式开始学习heap的第一天，简单的在自己的博客里记录一下，当做自己的学习笔记。<br>1)在linux的堆学习中，我们主要学习的就是malloc，relloc和free三个函数。<br>2)要知道：<br>    有哪些位置的记忆体是可以被分配的<br>    有哪些是因为被free掉而可以被回收的<br>    有哪些是使用中不需要记录，使用他们的人应该记住这些指标（heap本身并不会记录）<br>3)整个heap的资料记录在一个struct malloc_state中，名为main_arena<br>  malloc分配的记忆体名为chunk，会比要求的大小要大一点，因为需要记录一些额外的data<br>  Arena跟heap分配的记忆体分开存放，heap overflow没办法直接覆盖掉他的内容</p>
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>正式开始学习heap的第一天，简单的在自己的博客里记录一下，当做自己的学习笔记。<br>1)在linux的堆学习中，我们主要学习的就是malloc，relloc和free三个函数。<br>2)要知道：<br>    有哪些位置的记忆体是可以被分配的<br>    有哪些是因为被free掉而可以被回收的<br>    有哪些是使用中不需要记录，使用他们的人应该记住这些指标（heap本身并不会记录）<br>3)整个heap的资料记录在一个struct malloc_state中，名为main_arena<br>  malloc分配的记忆体名为chunk，会比要求的大小要大一点，因为需要记录一些额外的data<br>  Arena跟heap分配的记忆体分开存放，heap overflow没办法直接覆盖掉他的内容</p>
 <hr>
-<p>##基本内容<br>然后我们可以自己编写一个heap.c来看heap的操作会发生什么事情。</p>
+<h2 id="基本内容"><a href="#基本内容" class="headerlink" title="基本内容"></a>基本内容</h2><p>然后我们可以自己编写一个heap.c来看heap的操作会发生什么事情。</p>
 
       
     </div>
