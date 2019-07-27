@@ -25,7 +25,7 @@
 <meta property="og:locale" content="default">
 <meta property="og:image" content="http://yoursite.com/img/pwn_100_1.jpg">
 <meta property="og:image" content="http://yoursite.com/img/pwn_100_2.jpg">
-<meta property="og:updated_time" content="2019-07-27T13:59:20.005Z">
+<meta property="og:updated_time" content="2019-07-27T14:17:49.542Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="使用LibcSearcher解题">
 <meta name="twitter:description" content="我们都知道，很多时候，我们做pwn题出题者是不会给我们libc文件的，这时候，我们就需要通过各种方法来获得libc的版本，libc的基址等。这时候我们首先想到的就是泄露一个函数的真实地址。这时候，我们就可以来查找我们需要的libc版本以及偏移。在以前，获取一个函数地址之后我们就可以在libc.database网站上直接查找libc版本等信息，但现在这个网站好像不行了，所以我们现在只能通过LibcS">
@@ -302,6 +302,8 @@
       
           
         <p>我们都知道，很多时候，我们做pwn题出题者是不会给我们libc文件的，这时候，我们就需要通过各种方法来获得libc的版本，libc的基址等。这时候我们首先想到的就是泄露一个函数的真实地址。这时候，我们就可以来查找我们需要的libc版本以及偏移。在以前，获取一个函数地址之后我们就可以在libc.database网站上直接查找libc版本等信息，但现在这个网站好像不行了，所以我们现在只能通过LibcSearcher库或者pwntools的DynELF来做题。</p>
+<a id="more"></a>
+
 <h2 id="LibcSearcher的基本用法"><a href="#LibcSearcher的基本用法" class="headerlink" title="LibcSearcher的基本用法"></a>LibcSearcher的基本用法</h2><p>LibcSearcher库的使用方法是非常简单的，只需要我们泄露出一个函数的真实地址之后，就可以利用这个库自带的工具来得出offset<br>了。具体代码大体如下：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">obj = LibcSearcher(&apos;puts&apos;,putsaddr) </span><br><span class="line">libc_base = putsaddr - obj.dump(&apos;puts&apos;) //算出libc基地址</span><br><span class="line">system = libc_base+obj.dump(&apos;system&apos;)   //算出各函数的真实地址</span><br><span class="line">bins = libc_base+obj.dump(&apos;str_bin_sh&apos;)</span><br></pre></td></tr></table></figure>
 
@@ -320,7 +322,7 @@
         <p><span>本文标题:</span><a href="/2019/07/27/使用LibcSearcher解题/">使用LibcSearcher解题</a></p>
         <p><span>文章作者:</span><a href="/" title="回到主页">HeZhaochen</a></p>
         <p><span>发布时间:</span>2019-07-27, 21:30:22</p>
-        <p><span>最后更新:</span>2019-07-27, 21:59:20</p>
+        <p><span>最后更新:</span>2019-07-27, 22:17:49</p>
         <p>
             <span>原始链接:</span><a class="post-url" href="/2019/07/27/使用LibcSearcher解题/" title="使用LibcSearcher解题">http://yoursite.com/2019/07/27/使用LibcSearcher解题/</a>
             <span class="copy-path" data-clipboard-text="原文: http://yoursite.com/2019/07/27/使用LibcSearcher解题/　　作者: HeZhaochen" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>

