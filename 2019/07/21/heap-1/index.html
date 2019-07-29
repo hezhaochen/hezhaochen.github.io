@@ -26,7 +26,7 @@
 <meta property="og:image" content="http://yoursite.com/img/inuse.jpg">
 <meta property="og:image" content="http://yoursite.com/img/chunk.jpg">
 <meta property="og:image" content="http://yoursite.com/img/noinuse.jpg">
-<meta property="og:updated_time" content="2019-07-27T14:37:33.328Z">
+<meta property="og:updated_time" content="2019-07-29T12:44:59.508Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="heap-1">
 <meta name="twitter:description" content="简介正式开始学习heap的第一天，简单的在自己的博客里记录一下，当做自己的学习笔记。">
@@ -304,6 +304,8 @@
           
         <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>正式开始学习heap的第一天，简单的在自己的博客里记录一下，当做自己的学习笔记。</p>
 <a id="more"></a>
+<p>各式命令:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ltrace -e &apos;malloc+free+&apos; ./heap  //可用来查看地址等内容</span><br><span class="line">p/x *(struct malloc_chunk*)0x602000 //gdb中以chunk的格式查看chunk里的内容</span><br><span class="line">p main_arena // 查看main_arena内容</span><br><span class="line">x/40gx 0x602000 //查看堆中内容</span><br></pre></td></tr></table></figure>
 
 <ul>
 <li>在linux的堆学习中，我们主要学习的就是malloc，relloc和free三个函数。</li>
@@ -346,7 +348,31 @@
 <li>下一个chunk是chunk+size</li>
 <li>前一个chunk是chunk-prev_size</li>
 </ul>
-<h3 id="size的栏位"><a href="#size的栏位" class="headerlink" title="size的栏位"></a>size的栏位</h3>
+<h3 id="size的栏位"><a href="#size的栏位" class="headerlink" title="size的栏位"></a>size的栏位</h3><p>size栏位包含chunk size和flag bits<br>chunk size最低三个bit有flag的作用</p>
+<ul>
+<li>fastbin&lt;= </li>
+<li>smallbin&lt;1024</li>
+<li>largebin</li>
+<li>mmap&gt;=0x20000</li>
+</ul>
+<p>最低的bit为prev_inuse bit,用来表示前一个chunk是不是被使用</p>
+<ul>
+<li>free会使得下个个chunk的prev_inuse bit 被设为0</li>
+</ul>
+<p>在上面那个实例当中，当我们free(p)之后，我们会发现，q的size的最后一位变成了0，这就代表p not_inise</p>
+<h2 id="heap的操作"><a href="#heap的操作" class="headerlink" title="heap的操作"></a>heap的操作</h2><p>p = malloc(size)</p>
+<ul>
+<li>找出一个可用的chunk，或者从top chunk上切下来一块</li>
+<li>如果这个chunk是回收的，要先从bin中unlink，即移出linked list</li>
+<li>填好结构，并回传chunk+16</li>
+</ul>
+<p>free(p)</p>
+<ul>
+<li>检查一下该chunk前后的chunk是不是not inuse</li>
+<li>如果有，则这些回收的记忆体可以被合并成一块</li>
+<li>合并成新的chunk，放进对应的bin中</li>
+</ul>
+
       
     </div>
     
@@ -357,7 +383,7 @@
         <p><span>本文标题:</span><a href="/2019/07/21/heap-1/">heap-1</a></p>
         <p><span>文章作者:</span><a href="/" title="回到主页">HeZhaochen</a></p>
         <p><span>发布时间:</span>2019-07-21, 19:28:21</p>
-        <p><span>最后更新:</span>2019-07-27, 22:37:33</p>
+        <p><span>最后更新:</span>2019-07-29, 20:44:59</p>
         <p>
             <span>原始链接:</span><a class="post-url" href="/2019/07/21/heap-1/" title="heap-1">http://yoursite.com/2019/07/21/heap-1/</a>
             <span class="copy-path" data-clipboard-text="原文: http://yoursite.com/2019/07/21/heap-1/　　作者: HeZhaochen" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
@@ -393,7 +419,7 @@
     <div id="toc" class="toc-article">
         <strong class="toc-title">文章目录</strong>
         
-            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#简介"><span class="toc-number">1.</span> <span class="toc-text">简介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#基本内容"><span class="toc-number">2.</span> <span class="toc-text">基本内容</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#chunk的知识"><span class="toc-number">3.</span> <span class="toc-text">chunk的知识</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#chunk的栏位"><span class="toc-number">3.1.</span> <span class="toc-text">chunk的栏位</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#size的栏位"><span class="toc-number">3.2.</span> <span class="toc-text">size的栏位</span></a></li></ol></li></ol>
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#简介"><span class="toc-number">1.</span> <span class="toc-text">简介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#基本内容"><span class="toc-number">2.</span> <span class="toc-text">基本内容</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#chunk的知识"><span class="toc-number">3.</span> <span class="toc-text">chunk的知识</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#chunk的栏位"><span class="toc-number">3.1.</span> <span class="toc-text">chunk的栏位</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#size的栏位"><span class="toc-number">3.2.</span> <span class="toc-text">size的栏位</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#heap的操作"><span class="toc-number">4.</span> <span class="toc-text">heap的操作</span></a></li></ol>
         
     </div>
     <style>
