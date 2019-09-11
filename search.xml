@@ -8,9 +8,15 @@
       <link href="/2019/09/10/%E5%88%9D%E6%AC%A1%E5%AD%A6%E4%B9%A0RSA%E5%AF%86%E7%A0%81/"/>
       <url>/2019/09/10/%E5%88%9D%E6%AC%A1%E5%AD%A6%E4%B9%A0RSA%E5%AF%86%E7%A0%81/</url>
       
-        <content type="html"><![CDATA[]]></content>
+        <content type="html"><![CDATA[<pre><code>ctf比赛中，密码是十分重要的一块内容，而这其中RSA密码也是最重要最基础的一块，所以今天就花一点时间来好好总结梳理一</code></pre><p>下RSA密码的各种知识。</p><a id="more"></a><h2 id="RSA密码的基本知识"><a href="#RSA密码的基本知识" class="headerlink" title="RSA密码的基本知识"></a>RSA密码的基本知识</h2><p>要学习RSA密码，我们首先需要了解的就是它的一些基本原理。RSA加密，是一种利用公钥私钥对明文进行加密的一种加密算法，其中运<br>用了很多数学知识，现在我们先来把这些数学知识梳理一下。</p><h3 id="素数，互质数"><a href="#素数，互质数" class="headerlink" title="素数，互质数"></a>素数，互质数</h3><p>素数：一个数如果出了1和它本身之外没有其他的因数，那么就是一个素数。这是一个很简单的数学概念。</p><p>互质数：如果两个整数a,b的最大公因数（greatest common divisor）为1，即gcb(a,b)=1，那么称a,b两数互质</p><h3 id="欧拉函数值"><a href="#欧拉函数值" class="headerlink" title="欧拉函数值"></a>欧拉函数值</h3><p>设m为正整数，则1,2,3,4…….,m中与m互素的整数的个数记为φ(m)，叫做欧拉函数，欧拉函数的值叫做欧拉函数值。</p><h3 id="取模运算与同余"><a href="#取模运算与同余" class="headerlink" title="取模运算与同余"></a>取模运算与同余</h3><p>模运算即求余运算。“模”是“Mod”的音译。和模运算紧密相关的一个概念是“同余”。数学上，当两个整数除以同一个正整数，若得相同余<br>数，则二整数同余。<br>两个整数a，b，若它们除以正整数m所得的余数相等，则称a，b对于模m同余，记作: a ≡ b (mod m)<br>；读作：a同余于b模m，或者，a与b关于模m同余。例如：26 ≡ 14 (mod 12)。</p><h3 id="模指数运算"><a href="#模指数运算" class="headerlink" title="模指数运算"></a>模指数运算</h3><p>模指数运算即先进行指数运算，在进行模运算</p><h2 id="RSA加密算法"><a href="#RSA加密算法" class="headerlink" title="RSA加密算法"></a>RSA加密算法</h2><h3 id="RSA加密涉及元素"><a href="#RSA加密涉及元素" class="headerlink" title="RSA加密涉及元素"></a>RSA加密涉及元素</h3><p>N：大整数N，我们称之为模数（modulus）<br>p 和 q ：大整数N的两个因子（factor）<br>e 和 d：互为模反数的两个指数（exponent）<br>c 和 m：分别是密文和明文，这里一般指的是一个十进制的数还有一个就是n的欧拉函数值，在求解d的时候常用</p><h3 id="算法的实现"><a href="#算法的实现" class="headerlink" title="算法的实现"></a>算法的实现</h3><p>N = p<em>q<br>1.φ(n) = (p-1)(q-1) ;这里的φ(n)即为n的欧拉函数值<br>2.选择一个e(1&lt; e &lt;φ(n))<br>3.d</em>e ≡ 1 (mod φ(n)),求出d</p><p>最后，以{e,n}为公开密钥，以{d,n}为秘密秘钥</p><p>在知道这些信息之后，我们就可以开始进行数据的加密和解密了</p><p>我们假设Bob要向Alice发送一些信息m，Bob知道的是公钥{e，n}，然后计算密文 c ≡ me (mod n)，然后就可以把密文c发送给Al<br>ice了。</p><p>接收方Alice在接收到信息c之后，就可以用自己掌握的私钥{d，n}计算 m ≡ cd (mod n)</p>]]></content>
       
       
+      
+        <tags>
+            
+            <tag> 密码学 </tag>
+            
+        </tags>
       
     </entry>
     

@@ -15,14 +15,18 @@
 
 
 
+<meta name="description" content="ctf比赛中，密码是十分重要的一块内容，而这其中RSA密码也是最重要最基础的一块，所以今天就花一点时间来好好总结梳理一下RSA密码的各种知识。">
+<meta name="keywords" content="密码学">
 <meta property="og:type" content="article">
 <meta property="og:title" content="初次学习RSA密码">
 <meta property="og:url" content="http://yoursite.com/2019/09/10/初次学习RSA密码/index.html">
 <meta property="og:site_name" content="good good study,day day up!">
+<meta property="og:description" content="ctf比赛中，密码是十分重要的一块内容，而这其中RSA密码也是最重要最基础的一块，所以今天就花一点时间来好好总结梳理一下RSA密码的各种知识。">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-09-10T14:10:40.322Z">
+<meta property="og:updated_time" content="2019-09-11T11:37:57.853Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="初次学习RSA密码">
+<meta name="twitter:description" content="ctf比赛中，密码是十分重要的一块内容，而这其中RSA密码也是最重要最基础的一块，所以今天就花一点时间来好好总结梳理一下RSA密码的各种知识。">
 
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
@@ -179,7 +183,7 @@
                 
                 <section class="switch-part switch-part2">
                     <div class="widget tagcloud" id="js-tagcloud">
-                        <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/heap/">heap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pwn/">pwn</a></li></ul>
+                        <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/heap/">heap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pwn/">pwn</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/密码学/">密码学</a></li></ul>
                     </div>
                 </section>
                 
@@ -283,6 +287,10 @@
         
 
         
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/密码学/">密码学</a></li></ul>
+    </div>
+
         <div class="clearfix"></div>
       </div>
       
@@ -290,7 +298,21 @@
     <div class="article-entry" itemprop="articleBody">
       
           
-        
+        <pre><code>ctf比赛中，密码是十分重要的一块内容，而这其中RSA密码也是最重要最基础的一块，所以今天就花一点时间来好好总结梳理一</code></pre><p>下RSA密码的各种知识。</p>
+<a id="more"></a>
+<h2 id="RSA密码的基本知识"><a href="#RSA密码的基本知识" class="headerlink" title="RSA密码的基本知识"></a>RSA密码的基本知识</h2><p>要学习RSA密码，我们首先需要了解的就是它的一些基本原理。RSA加密，是一种利用公钥私钥对明文进行加密的一种加密算法，其中运<br>用了很多数学知识，现在我们先来把这些数学知识梳理一下。</p>
+<h3 id="素数，互质数"><a href="#素数，互质数" class="headerlink" title="素数，互质数"></a>素数，互质数</h3><p>素数：一个数如果出了1和它本身之外没有其他的因数，那么就是一个素数。这是一个很简单的数学概念。</p>
+<p>互质数：如果两个整数a,b的最大公因数（greatest common divisor）为1，即gcb(a,b)=1，那么称a,b两数互质</p>
+<h3 id="欧拉函数值"><a href="#欧拉函数值" class="headerlink" title="欧拉函数值"></a>欧拉函数值</h3><p>设m为正整数，则1,2,3,4…….,m中与m互素的整数的个数记为φ(m)，叫做欧拉函数，欧拉函数的值叫做欧拉函数值。</p>
+<h3 id="取模运算与同余"><a href="#取模运算与同余" class="headerlink" title="取模运算与同余"></a>取模运算与同余</h3><p>模运算即求余运算。“模”是“Mod”的音译。和模运算紧密相关的一个概念是“同余”。数学上，当两个整数除以同一个正整数，若得相同余<br>数，则二整数同余。<br>两个整数a，b，若它们除以正整数m所得的余数相等，则称a，b对于模m同余，记作: a ≡ b (mod m)<br>；读作：a同余于b模m，或者，a与b关于模m同余。例如：26 ≡ 14 (mod 12)。</p>
+<h3 id="模指数运算"><a href="#模指数运算" class="headerlink" title="模指数运算"></a>模指数运算</h3><p>模指数运算即先进行指数运算，在进行模运算</p>
+<h2 id="RSA加密算法"><a href="#RSA加密算法" class="headerlink" title="RSA加密算法"></a>RSA加密算法</h2><h3 id="RSA加密涉及元素"><a href="#RSA加密涉及元素" class="headerlink" title="RSA加密涉及元素"></a>RSA加密涉及元素</h3><p>N：大整数N，我们称之为模数（modulus）<br>p 和 q ：大整数N的两个因子（factor）<br>e 和 d：互为模反数的两个指数（exponent）<br>c 和 m：分别是密文和明文，这里一般指的是一个十进制的数还有一个就是n的欧拉函数值，在求解d的时候常用</p>
+<h3 id="算法的实现"><a href="#算法的实现" class="headerlink" title="算法的实现"></a>算法的实现</h3><p>N = p<em>q<br>1.φ(n) = (p-1)(q-1) ;这里的φ(n)即为n的欧拉函数值<br>2.选择一个e(1&lt; e &lt;φ(n))<br>3.d</em>e ≡ 1 (mod φ(n)),求出d</p>
+<p>最后，以{e,n}为公开密钥，以{d,n}为秘密秘钥</p>
+<p>在知道这些信息之后，我们就可以开始进行数据的加密和解密了</p>
+<p>我们假设Bob要向Alice发送一些信息m，Bob知道的是公钥{e，n}，然后计算密文 c ≡ me (mod n)，然后就可以把密文c发送给Al<br>ice了。</p>
+<p>接收方Alice在接收到信息c之后，就可以用自己掌握的私钥{d，n}计算 m ≡ cd (mod n)</p>
+
       
     </div>
     
@@ -301,7 +323,7 @@
         <p><span>本文标题:</span><a href="/2019/09/10/初次学习RSA密码/">初次学习RSA密码</a></p>
         <p><span>文章作者:</span><a href="/" title="回到主页">HeZhaochen</a></p>
         <p><span>发布时间:</span>2019-09-10, 22:10:40</p>
-        <p><span>最后更新:</span>2019-09-10, 22:10:40</p>
+        <p><span>最后更新:</span>2019-09-11, 19:37:57</p>
         <p>
             <span>原始链接:</span><a class="post-url" href="/2019/09/10/初次学习RSA密码/" title="初次学习RSA密码">http://yoursite.com/2019/09/10/初次学习RSA密码/</a>
             <span class="copy-path" data-clipboard-text="原文: http://yoursite.com/2019/09/10/初次学习RSA密码/　　作者: HeZhaochen" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
@@ -331,7 +353,7 @@
     <div id="toc" class="toc-article">
         <strong class="toc-title">文章目录</strong>
         
-            
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#RSA密码的基本知识"><span class="toc-number">1.</span> <span class="toc-text">RSA密码的基本知识</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#素数，互质数"><span class="toc-number">1.1.</span> <span class="toc-text">素数，互质数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#欧拉函数值"><span class="toc-number">1.2.</span> <span class="toc-text">欧拉函数值</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#取模运算与同余"><span class="toc-number">1.3.</span> <span class="toc-text">取模运算与同余</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#模指数运算"><span class="toc-number">1.4.</span> <span class="toc-text">模指数运算</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#RSA加密算法"><span class="toc-number">2.</span> <span class="toc-text">RSA加密算法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#RSA加密涉及元素"><span class="toc-number">2.1.</span> <span class="toc-text">RSA加密涉及元素</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#算法的实现"><span class="toc-number">2.2.</span> <span class="toc-text">算法的实现</span></a></li></ol></li></ol>
         
     </div>
     <style>
