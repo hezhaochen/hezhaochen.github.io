@@ -15,21 +15,21 @@
 
 
 
-<meta name="description" content="漏洞的大致分析我们在linux中分析之后发现这是一个32位的程序，开启了NX保护和canary通过ida逆向一下我们发现这里有一个很明显的格式化字符串漏洞，这样我们就可以通过修改函数的got表为system的plt来实现我们的目的。 漏洞的具体利用方式我首先使用了一个计算格式化字符串偏移的通用脚本 1234567891011121314151617# fmt_test.py#! /usr/bin/">
+<meta name="description" content="一道比较好的格式化字符串，通过这道题目可以有效训练自己构造payload的能力">
 <meta name="keywords" content="pwn">
 <meta property="og:type" content="article">
 <meta property="og:title" content="mma-ctf-2nd-2016-greeting-150">
 <meta property="og:url" content="http://yoursite.com/2019/11/18/mma-ctf-2nd-2016-greeting-150/index.html">
 <meta property="og:site_name" content="good good study,day day up!">
-<meta property="og:description" content="漏洞的大致分析我们在linux中分析之后发现这是一个32位的程序，开启了NX保护和canary通过ida逆向一下我们发现这里有一个很明显的格式化字符串漏洞，这样我们就可以通过修改函数的got表为system的plt来实现我们的目的。 漏洞的具体利用方式我首先使用了一个计算格式化字符串偏移的通用脚本 1234567891011121314151617# fmt_test.py#! /usr/bin/">
+<meta property="og:description" content="一道比较好的格式化字符串，通过这道题目可以有效训练自己构造payload的能力">
 <meta property="og:locale" content="default">
 <meta property="og:image" content="http://yoursite.com/img/greeting/1.jpg">
 <meta property="og:image" content="http://yoursite.com/img/greeting/2.jpg">
 <meta property="og:image" content="http://yoursite.com/img/greeting/3.jpg">
-<meta property="og:updated_time" content="2019-11-18T15:25:50.983Z">
+<meta property="og:updated_time" content="2019-11-18T15:32:28.562Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="mma-ctf-2nd-2016-greeting-150">
-<meta name="twitter:description" content="漏洞的大致分析我们在linux中分析之后发现这是一个32位的程序，开启了NX保护和canary通过ida逆向一下我们发现这里有一个很明显的格式化字符串漏洞，这样我们就可以通过修改函数的got表为system的plt来实现我们的目的。 漏洞的具体利用方式我首先使用了一个计算格式化字符串偏移的通用脚本 1234567891011121314151617# fmt_test.py#! /usr/bin/">
+<meta name="twitter:description" content="一道比较好的格式化字符串，通过这道题目可以有效训练自己构造payload的能力">
 <meta name="twitter:image" content="http://yoursite.com/img/greeting/1.jpg">
 
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -302,7 +302,9 @@
     <div class="article-entry" itemprop="articleBody">
       
           
-        <h2 id="漏洞的大致分析"><a href="#漏洞的大致分析" class="headerlink" title="漏洞的大致分析"></a>漏洞的大致分析</h2><p>我们在linux中分析之后发现这是一个32位的程序，开启了NX保护和canary<br><img src="/img/greeting/1.jpg" alt="avatar"><br>通过ida逆向一下<br><img src="/img/greeting/2.jpg" alt="avatar"><br>我们发现这里有一个很明显的格式化字符串漏洞，这样我们就可以通过修改函数的got表为system的plt来实现我们的目的。</p>
+        <p>一道比较好的格式化字符串，通过这道题目可以有效训练自己构造payload的能力</p>
+<a id="more"></a>
+<h2 id="漏洞的大致分析"><a href="#漏洞的大致分析" class="headerlink" title="漏洞的大致分析"></a>漏洞的大致分析</h2><p>我们在linux中分析之后发现这是一个32位的程序，开启了NX保护和canary<br><img src="/img/greeting/1.jpg" alt="avatar"><br>通过ida逆向一下<br><img src="/img/greeting/2.jpg" alt="avatar"><br>我们发现这里有一个很明显的格式化字符串漏洞，这样我们就可以通过修改函数的got表为system的plt来实现我们的目的。</p>
 <h2 id="漏洞的具体利用方式"><a href="#漏洞的具体利用方式" class="headerlink" title="漏洞的具体利用方式"></a>漏洞的具体利用方式</h2><p>我首先使用了一个计算格式化字符串偏移的通用脚本</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"># fmt_test.py</span><br><span class="line">#! /usr/bin/env python</span><br><span class="line"># -*- coding: utf-8 -*-</span><br><span class="line"></span><br><span class="line">from pwn import *</span><br><span class="line"></span><br><span class="line">#context.log_level = &apos;debug&apos;</span><br><span class="line"></span><br><span class="line">def exec_fmt(payload):</span><br><span class="line">    p = process(&quot;./pwn&quot;)</span><br><span class="line">    p.sendline(payload)</span><br><span class="line">    info = p.recv()</span><br><span class="line">    p.close()</span><br><span class="line">    return info</span><br><span class="line"></span><br><span class="line">autofmt = FmtStr(exec_fmt)</span><br><span class="line">print autofmt.offset</span><br></pre></td></tr></table></figure>
 
@@ -328,7 +330,7 @@
         <p><span>本文标题:</span><a href="/2019/11/18/mma-ctf-2nd-2016-greeting-150/">mma-ctf-2nd-2016-greeting-150</a></p>
         <p><span>文章作者:</span><a href="/" title="回到主页">HeZhaochen</a></p>
         <p><span>发布时间:</span>2019-11-18, 22:14:59</p>
-        <p><span>最后更新:</span>2019-11-18, 23:25:50</p>
+        <p><span>最后更新:</span>2019-11-18, 23:32:28</p>
         <p>
             <span>原始链接:</span><a class="post-url" href="/2019/11/18/mma-ctf-2nd-2016-greeting-150/" title="mma-ctf-2nd-2016-greeting-150">http://yoursite.com/2019/11/18/mma-ctf-2nd-2016-greeting-150/</a>
             <span class="copy-path" data-clipboard-text="原文: http://yoursite.com/2019/11/18/mma-ctf-2nd-2016-greeting-150/　　作者: HeZhaochen" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
