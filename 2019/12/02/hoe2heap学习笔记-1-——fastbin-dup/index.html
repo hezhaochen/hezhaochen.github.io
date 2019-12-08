@@ -15,18 +15,18 @@
 
 
 
-<meta name="description" content="前言最近比较忙，已经好久没有比较认真的搞一下pwn了，今天就好好学习一下堆利用的相关知识。这里我会通过how2heap这个平台 来进行学习。how2heap是由国际知名CTF战队Shellphish 团队创建的一个仓库，是用来学习堆利用技术广为周知的地方。且 主要针对 glibc2.25和glibc2.26。">
+<meta name="description" content="前言 最近比较忙，已经好久没有比较认真的搞一下pwn了，今天就好好学习一下堆利用的相关知识。这里我会通过how2heap这个平台 来进行学习。how2heap是由国际知名CTF战队Shellphish 团队创建的一个仓库，是用来学习堆利用技术广为周知的地方。且 主要针对 glibc2.25和glibc2.26。">
 <meta name="keywords" content="how2heap">
 <meta property="og:type" content="article">
 <meta property="og:title" content="hoe2heap学习笔记(1)——fastbin_dup">
 <meta property="og:url" content="http://yoursite.com/2019/12/02/hoe2heap学习笔记-1-——fastbin-dup/index.html">
 <meta property="og:site_name" content="good good study,day day up!">
-<meta property="og:description" content="前言最近比较忙，已经好久没有比较认真的搞一下pwn了，今天就好好学习一下堆利用的相关知识。这里我会通过how2heap这个平台 来进行学习。how2heap是由国际知名CTF战队Shellphish 团队创建的一个仓库，是用来学习堆利用技术广为周知的地方。且 主要针对 glibc2.25和glibc2.26。">
+<meta property="og:description" content="前言 最近比较忙，已经好久没有比较认真的搞一下pwn了，今天就好好学习一下堆利用的相关知识。这里我会通过how2heap这个平台 来进行学习。how2heap是由国际知名CTF战队Shellphish 团队创建的一个仓库，是用来学习堆利用技术广为周知的地方。且 主要针对 glibc2.25和glibc2.26。">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-12-08T08:14:25.624Z">
+<meta property="og:updated_time" content="2019-12-08T08:16:32.614Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="hoe2heap学习笔记(1)——fastbin_dup">
-<meta name="twitter:description" content="前言最近比较忙，已经好久没有比较认真的搞一下pwn了，今天就好好学习一下堆利用的相关知识。这里我会通过how2heap这个平台 来进行学习。how2heap是由国际知名CTF战队Shellphish 团队创建的一个仓库，是用来学习堆利用技术广为周知的地方。且 主要针对 glibc2.25和glibc2.26。">
+<meta name="twitter:description" content="前言 最近比较忙，已经好久没有比较认真的搞一下pwn了，今天就好好学习一下堆利用的相关知识。这里我会通过how2heap这个平台 来进行学习。how2heap是由国际知名CTF战队Shellphish 团队创建的一个仓库，是用来学习堆利用技术广为周知的地方。且 主要针对 glibc2.25和glibc2.26。">
 
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
@@ -298,7 +298,7 @@
     <div class="article-entry" itemprop="articleBody">
       
           
-        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><pre><code>最近比较忙，已经好久没有比较认真的搞一下pwn了，今天就好好学习一下堆利用的相关知识。这里我会通过how2heap这个平台</code></pre><p> 来进行学习。how2heap是由国际知名CTF战队Shellphish 团队创建的一个仓库，是用来学习堆利用技术广为周知的地方。且<br> 主要针对 glibc2.25和glibc2.26。</p>
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p> 最近比较忙，已经好久没有比较认真的搞一下pwn了，今天就好好学习一下堆利用的相关知识。这里我会通过how2heap这个平台<br> 来进行学习。how2heap是由国际知名CTF战队Shellphish 团队创建的一个仓库，是用来学习堆利用技术广为周知的地方。且<br> 主要针对 glibc2.25和glibc2.26。</p>
 <a id="more"></a>
 <h2 id="fastbin-dup-fit"><a href="#fastbin-dup-fit" class="headerlink" title="fastbin_dup_fit"></a>fastbin_dup_fit</h2><p>这个程序不演示攻击，但是向我们演示了glibc的分配机制</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;stdlib.h&gt;</span><br><span class="line">#include &lt;string.h&gt;</span><br><span class="line"></span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">	fprintf(stderr, &quot;This file doesn&apos;t demonstrate an attack, but shows the nature of glibc&apos;s allocator.\n&quot;);</span><br><span class="line">	fprintf(stderr, &quot;glibc uses a first-fit algorithm to select a free chunk.\n&quot;);</span><br><span class="line">	fprintf(stderr, &quot;If a chunk is free and large enough, malloc will select this chunk.\n&quot;);</span><br><span class="line">	fprintf(stderr, &quot;This can be exploited in a use-after-free situation.\n&quot;);</span><br><span class="line"></span><br><span class="line">	fprintf(stderr, &quot;Allocating 2 buffers. They can be large, don&apos;t have to be fastbin.\n&quot;);</span><br><span class="line">	char* a = malloc(0x512);</span><br><span class="line">	char* b = malloc(0x256);</span><br><span class="line">	char* c;</span><br><span class="line"></span><br><span class="line">	fprintf(stderr, &quot;1st malloc(0x512): %p\n&quot;, a);</span><br><span class="line">	fprintf(stderr, &quot;2nd malloc(0x256): %p\n&quot;, b);</span><br><span class="line">	fprintf(stderr, &quot;we could continue mallocing here...\n&quot;);</span><br><span class="line">	fprintf(stderr, &quot;now let&apos;s put a string at a that we can read later \&quot;this is A!\&quot;\n&quot;);</span><br><span class="line">	strcpy(a, &quot;this is A!&quot;);</span><br><span class="line">	fprintf(stderr, &quot;first allocation %p points to %s\n&quot;, a, a);</span><br><span class="line"></span><br><span class="line">	fprintf(stderr, &quot;Freeing the first one...\n&quot;);</span><br><span class="line">	free(a);</span><br><span class="line"></span><br><span class="line">	fprintf(stderr, &quot;We don&apos;t need to free anything again. As long as we allocate smaller than 0x512, it will end up at %p\n&quot;, a);</span><br><span class="line"></span><br><span class="line">	fprintf(stderr, &quot;So, let&apos;s allocate 0x500 bytes\n&quot;);</span><br><span class="line">	c = malloc(506);</span><br><span class="line">	fprintf(stderr, &quot;3rd malloc(0x500): %p\n&quot;, c);</span><br><span class="line">	fprintf(stderr, &quot;And put a different string here, \&quot;this is C!\&quot;\n&quot;);</span><br><span class="line">	strcpy(c, &quot;this is C!&quot;);</span><br><span class="line">	fprintf(stderr, &quot;3rd allocation %p points to %s\n&quot;, c, c);</span><br><span class="line">	fprintf(stderr, &quot;first allocation %p points to %s\n&quot;, a, a);</span><br><span class="line">	fprintf(stderr, &quot;If we reuse the first allocation, it now holds the data from the third allocation.\n&quot;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -332,7 +332,7 @@
         <p><span>本文标题:</span><a href="/2019/12/02/hoe2heap学习笔记-1-——fastbin-dup/">hoe2heap学习笔记(1)——fastbin_dup</a></p>
         <p><span>文章作者:</span><a href="/" title="回到主页">HeZhaochen</a></p>
         <p><span>发布时间:</span>2019-12-02, 22:38:48</p>
-        <p><span>最后更新:</span>2019-12-08, 16:14:25</p>
+        <p><span>最后更新:</span>2019-12-08, 16:16:32</p>
         <p>
             <span>原始链接:</span><a class="post-url" href="/2019/12/02/hoe2heap学习笔记-1-——fastbin-dup/" title="hoe2heap学习笔记(1)——fastbin_dup">http://yoursite.com/2019/12/02/hoe2heap学习笔记-1-——fastbin-dup/</a>
             <span class="copy-path" data-clipboard-text="原文: http://yoursite.com/2019/12/02/hoe2heap学习笔记-1-——fastbin-dup/　　作者: HeZhaochen" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
