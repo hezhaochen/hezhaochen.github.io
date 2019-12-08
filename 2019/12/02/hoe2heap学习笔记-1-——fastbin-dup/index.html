@@ -14,17 +14,19 @@
 <meta name="author" content="HeZhaochen">
 
 
-    
-    
 
-
-<meta property="og:type" content="website">
-<meta property="og:title" content="good good study,day day up!">
-<meta property="og:url" content="http://yoursite.com/index.html">
+<meta name="description" content="前言最近比较忙，已经好久没有比较认真的搞一下pwn了，今天就好好学习一下堆利用的相关知识。这里我会通过how2heap这个平台来进行学习。how2heap是由国际知名CTF战队Shellphish 团队创建的一个仓库，是用来学习堆利用技术广为周知的地方。 且主要针对 glibc2.25和glibc2.26。 fastbin_dup_fit这个程序不演示攻击，但是向我们演示了glibc的分配机制 1">
+<meta name="keywords" content="how2heap">
+<meta property="og:type" content="article">
+<meta property="og:title" content="hoe2heap学习笔记(1)——fastbin_dup">
+<meta property="og:url" content="http://yoursite.com/2019/12/02/hoe2heap学习笔记-1-——fastbin-dup/index.html">
 <meta property="og:site_name" content="good good study,day day up!">
+<meta property="og:description" content="前言最近比较忙，已经好久没有比较认真的搞一下pwn了，今天就好好学习一下堆利用的相关知识。这里我会通过how2heap这个平台来进行学习。how2heap是由国际知名CTF战队Shellphish 团队创建的一个仓库，是用来学习堆利用技术广为周知的地方。 且主要针对 glibc2.25和glibc2.26。 fastbin_dup_fit这个程序不演示攻击，但是向我们演示了glibc的分配机制 1">
 <meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-12-07T16:04:46.400Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="good good study,day day up!">
+<meta name="twitter:title" content="hoe2heap学习笔记(1)——fastbin_dup">
+<meta name="twitter:description" content="前言最近比较忙，已经好久没有比较认真的搞一下pwn了，今天就好好学习一下堆利用的相关知识。这里我会通过how2heap这个平台来进行学习。how2heap是由国际知名CTF战队Shellphish 团队创建的一个仓库，是用来学习堆利用技术广为周知的地方。 且主要针对 glibc2.25和glibc2.26。 fastbin_dup_fit这个程序不演示攻击，但是向我们演示了glibc的分配机制 1">
 
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
@@ -52,13 +54,11 @@
 <link rel="stylesheet" href="/css/style.css">
 
 
-    <style> .article { opacity: 0;} </style>
-
 
 <link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
 
 
-<title>good good study,day day up!</title>
+<title>hoe2heap学习笔记(1)——fastbin_dup | good good study,day day up!</title>
 
 <script src="//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
 <script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
@@ -67,8 +67,8 @@
     var yiliaConfig = {
         fancybox: true,
         animate: true,
-        isHome: true,
-        isPost: false,
+        isHome: false,
+        isPost: true,
         isArchive: false,
         isTag: false,
         isCategory: false,
@@ -258,9 +258,7 @@
     </div>
     <link class="menu-list" tags="标签" friends="友情链接" about="关于我"/>
 </nav>
-      <div class="body-wrap">
-  
-    <article id="post-hoe2heap学习笔记-1-——fastbin-dup" class="article article-type-post" itemscope itemprop="blogPost">
+      <div class="body-wrap"><article id="post-hoe2heap学习笔记-1-——fastbin-dup" class="article article-type-post" itemscope itemprop="blogPost">
   
     <div class="article-meta">
       <a href="/2019/12/02/hoe2heap学习笔记-1-——fastbin-dup/" class="article-date">
@@ -278,12 +276,23 @@
       <header class="article-header">
         
   
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/12/02/hoe2heap学习笔记-1-——fastbin-dup/">hoe2heap学习笔记(1)——fastbin_dup</a>
+    <h1 class="article-title" itemprop="name">
+      hoe2heap学习笔记(1)——fastbin_dup
     </h1>
   
 
       </header>
+      
+      <div class="article-info article-info-post">
+        
+
+        
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/how2heap/">how2heap</a></li></ul>
+    </div>
+
+        <div class="clearfix"></div>
+      </div>
       
     
     <div class="article-entry" itemprop="articleBody">
@@ -315,532 +324,119 @@
       
     </div>
     
-    <div class="article-info article-info-index">
-      
-      
-
-      
-    <div class="article-tag tagcloud">
-        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/how2heap/">how2heap</a></li></ul>
-    </div>
-
-      
-      <div class="clearfix"></div>
-    </div>
-    
   </div>
   
-</article>
-
-
-
-
-
-
-
-
-
-  
-    <article id="post-XCTF-format2-整数溢出" class="article article-type-post" itemscope itemprop="blogPost">
-  
-    <div class="article-meta">
-      <a href="/2019/11/20/XCTF-format2-整数溢出/" class="article-date">
-      <time datetime="2019-11-20T10:40:18.000Z" itemprop="datePublished">2019-11-20</time>
-</a>
-
-
-    </div>
-  
-  <div class="article-inner">
     
-      <input type="hidden" class="isFancy" />
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/11/20/XCTF-format2-整数溢出/">XCTF-format2-整数溢出</a>
-    </h1>
-  
-
-      </header>
-      
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-          
-              <p>本文是对一道比较基础的整数溢出题目的解析，其中运用到的一些有关汇编的知识是自己之前没有接触过的，复盘一下收获颇丰，下<br>面我们来看一下吧。</p>
-          
-      
-    </div>
-    
-    <div class="article-info article-info-index">
-      
-      
-
-      
-    <div class="article-tag tagcloud">
-        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/pwn/">pwn</a></li></ul>
-    </div>
-
-      
-        <p class="article-more-link">
-          <a href="/2019/11/20/XCTF-format2-整数溢出/#more">more >></a>
+    <div class="copyright">
+        <p><span>本文标题:</span><a href="/2019/12/02/hoe2heap学习笔记-1-——fastbin-dup/">hoe2heap学习笔记(1)——fastbin_dup</a></p>
+        <p><span>文章作者:</span><a href="/" title="回到主页">HeZhaochen</a></p>
+        <p><span>发布时间:</span>2019-12-02, 22:38:48</p>
+        <p><span>最后更新:</span>2019-12-08, 00:04:46</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/2019/12/02/hoe2heap学习笔记-1-——fastbin-dup/" title="hoe2heap学习笔记(1)——fastbin_dup">http://yoursite.com/2019/12/02/hoe2heap学习笔记-1-——fastbin-dup/</a>
+            <span class="copy-path" data-clipboard-text="原文: http://yoursite.com/2019/12/02/hoe2heap学习笔记-1-——fastbin-dup/　　作者: HeZhaochen" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
+            <script> var clipboard = new Clipboard('.copy-path'); </script>
         </p>
-      
-      <div class="clearfix"></div>
-    </div>
-    
-  </div>
-  
-</article>
-
-
-
-
-
-
-
-
-
-  
-    <article id="post-mma-ctf-2nd-2016-greeting-150" class="article article-type-post" itemscope itemprop="blogPost">
-  
-    <div class="article-meta">
-      <a href="/2019/11/18/mma-ctf-2nd-2016-greeting-150/" class="article-date">
-      <time datetime="2019-11-18T14:14:59.000Z" itemprop="datePublished">2019-11-18</time>
-</a>
-
-
-    </div>
-  
-  <div class="article-inner">
-    
-      <input type="hidden" class="isFancy" />
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/11/18/mma-ctf-2nd-2016-greeting-150/">mma-ctf-2nd-2016-greeting-150</a>
-    </h1>
-  
-
-      </header>
-      
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-          
-              <p>一道比较好的格式化字符串，通过这道题目可以有效训练自己构造payload的能力</p>
-          
-      
-    </div>
-    
-    <div class="article-info article-info-index">
-      
-      
-
-      
-    <div class="article-tag tagcloud">
-        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/pwn/">pwn</a></li></ul>
-    </div>
-
-      
-        <p class="article-more-link">
-          <a href="/2019/11/18/mma-ctf-2nd-2016-greeting-150/#more">more >></a>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" title="CC BY-NC-SA 4.0 International" target = "_blank">"署名-非商用-相同方式共享 4.0"</a> 转载请保留原文链接及作者。
         </p>
-      
-      <div class="clearfix"></div>
     </div>
-    
-  </div>
+
+
+
+    <nav id="article-nav">
+        
+        
+            <div id="article-nav-older" class="article-nav-title">
+                <a href="/2019/11/20/XCTF-format2-整数溢出/">
+                    XCTF-format2-整数溢出
+                </a>
+            </div>
+        
+    </nav>
+
   
 </article>
 
-
-
-
-
-
-
-
-
-  
-    <article id="post-MCTF校赛WP-2" class="article article-type-post" itemscope itemprop="blogPost">
-  
-    <div class="article-meta">
-      <a href="/2019/10/22/MCTF校赛WP-2/" class="article-date">
-      <time datetime="2019-10-22T00:34:37.000Z" itemprop="datePublished">2019-10-22</time>
-</a>
-
-
-    </div>
-  
-  <div class="article-inner">
-    
-      <input type="hidden" class="isFancy" />
-    
-    
-      <header class="article-header">
+    <div id="toc" class="toc-article">
+        <strong class="toc-title">文章目录</strong>
         
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/10/22/MCTF校赛WP-2/">MCTF校赛WP(2)</a>
-    </h1>
-  
-
-      </header>
-      
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-          
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#fastbin-dup-fit"><span class="toc-number">2.</span> <span class="toc-text">fastbin_dup_fit</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#fastbin-dup"><span class="toc-number">3.</span> <span class="toc-text">fastbin_dup</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#fastbin-dup-into-stack"><span class="toc-number">4.</span> <span class="toc-text">fastbin_dup_into_stack</span></a></li></ol>
         
-      
     </div>
+    <style>
+        .left-col .switch-btn,
+        .left-col .switch-area {
+            display: none;
+        }
+        .toc-level-3 i,
+        .toc-level-3 ol {
+            display: none !important;
+        }
+    </style>
+
+    <input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
+
+    <script>
+        yiliaConfig.toc = ["隐藏目录", "显示目录", !!"false"];
+    </script>
+
+
+
     
-    <div class="article-info article-info-index">
-      
-      
-
-      
-      
-      <div class="clearfix"></div>
-    </div>
+<div class="share">
     
-  </div>
-  
-</article>
-
-
-
-
-
-
-
-
-
-  
-    <article id="post-MCTF初赛WP-1" class="article article-type-post" itemscope itemprop="blogPost">
-  
-    <div class="article-meta">
-      <a href="/2019/10/17/MCTF初赛WP-1/" class="article-date">
-      <time datetime="2019-10-17T06:00:05.000Z" itemprop="datePublished">2019-10-17</time>
-</a>
-
-
-    </div>
-  
-  <div class="article-inner">
+        <div class="bdsharebuttonbox">
+            <a href="#" class="fa fa-twitter bds_twi" data-cmd="twi" title="分享到推特"></a>
+            <a href="#" class="fa fa-weibo bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+            <a href="#" class="fa fa-qq bds_sqq" data-cmd="sqq" title="分享给 QQ 好友"></a>
+            <a href="#" class="fa fa-files-o bds_copy" data-cmd="copy" title="复制网址"></a>
+            <a href="#" class="fa fa fa-envelope-o bds_mail" data-cmd="mail" title="通过邮件分享"></a>
+            <a href="#" class="fa fa-weixin bds_weixin" data-cmd="weixin" title="生成文章二维码"></a>
+            <a href="#" class="fa fa-share-alt bds_more" data-cmd="more"></i></a>
+        </div>
+        <script>
+            window._bd_share_config={
+                "common":{"bdSnsKey":{},"bdText":"hoe2heap学习笔记(1)——fastbin_dup　| good good study,day day up!　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+        </script>
     
-      <input type="hidden" class="isFancy" />
+
     
+</div>
+
+
+
+
+
+
+
     
-      <header class="article-header">
+
+
+
+
+    <div class="scroll" id="post-nav-button">
         
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/10/17/MCTF初赛WP-1/">MCTF初赛WP(1)</a>
-    </h1>
-  
-
-      </header>
-      
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-          
-              <p>这次校赛是我们17的大佬组织的，题目全都是大佬出的，自己做了一下，题目质量挺高的，有难题也有对新手比较友好的题目，下面<br>的WP。</p>
-          
-      
-    </div>
-    
-    <div class="article-info article-info-index">
-      
-      
-
-      
-      
-        <p class="article-more-link">
-          <a href="/2019/10/17/MCTF初赛WP-1/#more">more >></a>
-        </p>
-      
-      <div class="clearfix"></div>
-    </div>
-    
-  </div>
-  
-</article>
-
-
-
-
-
-
-
-
-
-  
-    <article id="post-初次学习RSA密码" class="article article-type-post" itemscope itemprop="blogPost">
-  
-    <div class="article-meta">
-      <a href="/2019/09/10/初次学习RSA密码/" class="article-date">
-      <time datetime="2019-09-10T14:10:40.000Z" itemprop="datePublished">2019-09-10</time>
-</a>
-
-
-    </div>
-  
-  <div class="article-inner">
-    
-      <input type="hidden" class="isFancy" />
-    
-    
-      <header class="article-header">
+            <a href="/" title="回到主页"><i class="fa fa-home"></i></a>
         
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/09/10/初次学习RSA密码/">初次学习RSA密码</a>
-    </h1>
-  
 
-      </header>
-      
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-          
-              <p>   ctf比赛中，密码是十分重要的一块内容，而这其中RSA密码也是最重要最基础的一块，所以今天就花一点时间来好好总结梳理<br>一下RSA密码的各种知识。</p>
-          
-      
-    </div>
-    
-    <div class="article-info article-info-index">
-      
-      
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
 
-      
-    <div class="article-tag tagcloud">
-        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/密码学/">密码学</a></li></ul>
-    </div>
-
-      
-        <p class="article-more-link">
-          <a href="/2019/09/10/初次学习RSA密码/#more">more >></a>
-        </p>
-      
-      <div class="clearfix"></div>
-    </div>
-    
-  </div>
-  
-</article>
-
-
-
-
-
-
-
-
-
-  
-    <article id="post-use-after-free的学习" class="article article-type-post" itemscope itemprop="blogPost">
-  
-    <div class="article-meta">
-      <a href="/2019/07/31/use-after-free的学习/" class="article-date">
-      <time datetime="2019-07-31T10:51:05.000Z" itemprop="datePublished">2019-07-31</time>
-</a>
-
-
-    </div>
-  
-  <div class="article-inner">
-    
-      <input type="hidden" class="isFancy" />
-    
-    
-      <header class="article-header">
         
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/07/31/use-after-free的学习/">use after free的学习</a>
-    </h1>
-  
-
-      </header>
-      
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-          
-              <p>初学堆的漏洞利用，就从最简单的Use After Free来学习吧！</p>
-          
-      
-    </div>
-    
-    <div class="article-info article-info-index">
-      
-      
-
-      
-    <div class="article-tag tagcloud">
-        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/heap/">heap</a></li></ul>
-    </div>
-
-      
-        <p class="article-more-link">
-          <a href="/2019/07/31/use-after-free的学习/#more">more >></a>
-        </p>
-      
-      <div class="clearfix"></div>
-    </div>
-    
-  </div>
-  
-</article>
-
-
-
-
-
-
-
-
-
-  
-    <article id="post-使用LibcSearcher解题" class="article article-type-post" itemscope itemprop="blogPost">
-  
-    <div class="article-meta">
-      <a href="/2019/07/27/使用LibcSearcher解题/" class="article-date">
-      <time datetime="2019-07-27T13:30:22.000Z" itemprop="datePublished">2019-07-27</time>
-</a>
-
-
-    </div>
-  
-  <div class="article-inner">
-    
-      <input type="hidden" class="isFancy" />
-    
-    
-      <header class="article-header">
+            <a href="/2019/11/20/XCTF-format2-整数溢出/" title="下一篇: XCTF-format2-整数溢出">
+                <i class="fa fa-angle-right"></i>
+            </a>
         
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/07/27/使用LibcSearcher解题/">使用LibcSearcher解题</a>
-    </h1>
-  
-
-      </header>
-      
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-          
-              <p>我们都知道，很多时候，我们做pwn题出题者是不会给我们libc文件的，这时候，我们就需要通过各种方法来获得libc的版本，libc的基址等。这时候我们首先想到的就是泄露一个函数的真实地址。这时候，我们就可以来查找我们需要的libc版本以及偏移。在以前，获取一个函数地址之后我们就可以在libc.database网站上直接查找libc版本等信息，但现在这个网站好像不行了，所以我们现在只能通过LibcSearcher库或者pwntools的DynELF来做题。</p>
-          
-      
-    </div>
-    
-    <div class="article-info article-info-index">
-      
-      
-
-      
-    <div class="article-tag tagcloud">
-        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/pwn/">pwn</a></li></ul>
     </div>
 
-      
-        <p class="article-more-link">
-          <a href="/2019/07/27/使用LibcSearcher解题/#more">more >></a>
-        </p>
-      
-      <div class="clearfix"></div>
-    </div>
-    
-  </div>
-  
-</article>
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2019/12/02/hoe2heap学习笔记-1-——fastbin-dup/">hoe2heap学习笔记(1)——fastbin_dup</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/11/20/XCTF-format2-整数溢出/">XCTF-format2-整数溢出</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/11/18/mma-ctf-2nd-2016-greeting-150/">mma-ctf-2nd-2016-greeting-150</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/10/22/MCTF校赛WP-2/">MCTF校赛WP(2)</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/10/17/MCTF初赛WP-1/">MCTF初赛WP(1)</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/09/10/初次学习RSA密码/">初次学习RSA密码</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/07/31/use-after-free的学习/">use after free的学习</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/07/27/使用LibcSearcher解题/">使用LibcSearcher解题</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/07/21/heap-1/">heap-1</a></li></ul>
 
 
 
 
-
-
-
-
-
-  
-    <article id="post-heap-1" class="article article-type-post" itemscope itemprop="blogPost">
-  
-    <div class="article-meta">
-      <a href="/2019/07/21/heap-1/" class="article-date">
-      <time datetime="2019-07-21T11:28:21.000Z" itemprop="datePublished">2019-07-21</time>
-</a>
-
-
-    </div>
-  
-  <div class="article-inner">
-    
-      <input type="hidden" class="isFancy" />
-    
-    
-      <header class="article-header">
+    <script>
         
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/07/21/heap-1/">heap-1</a>
-    </h1>
-  
-
-      </header>
-      
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-          
-              <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>正式开始学习heap的第一天，简单的在自己的博客里记录一下，当做自己的学习笔记。</p>
-          
-      
-    </div>
-    
-    <div class="article-info article-info-index">
-      
-      
-
-      
-    <div class="article-tag tagcloud">
-        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/heap/">heap</a></li></ul>
-    </div>
-
-      
-        <p class="article-more-link">
-          <a href="/2019/07/21/heap-1/#more">more >></a>
-        </p>
-      
-      <div class="clearfix"></div>
-    </div>
-    
-  </div>
-  
-</article>
-
-
-
-
-
-
-
-
-
-  
-  
+    </script>
 </div>
       <footer id="footer">
     <div class="outer">
