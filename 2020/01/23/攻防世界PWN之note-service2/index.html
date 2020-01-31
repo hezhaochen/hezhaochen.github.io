@@ -15,21 +15,21 @@
 
 
 
-<meta name="description" content="前言这是攻防世界上的一道算是一道堆方向的题目，但是主要考验的是我们对shellcode的编写以及对fastbin机制的了解，考验用这道题来正式入门堆方面的题目。 程序分析首先通过checksec分析发现，程序是一个64位程序，开启了canary和pie，但是并没有开NX保护，这就为我们在堆中写入shellcode提供了便利然后使用ida简单分析一下程序，发现只实现了添加和删除功能分析了添加之后，发">
+<meta name="description" content="前言这是攻防世界上的一道算是一道堆方向的题目，但是主要考验的是我们对shellcode的编写以及对fastbin机制的了解，考验用这道题来正式入门堆方面的题目。">
 <meta name="keywords" content="pwn">
 <meta property="og:type" content="article">
 <meta property="og:title" content="攻防世界PWN之note-service2">
 <meta property="og:url" content="http://yoursite.com/2020/01/23/攻防世界PWN之note-service2/index.html">
 <meta property="og:site_name" content="good good study,day day up!">
-<meta property="og:description" content="前言这是攻防世界上的一道算是一道堆方向的题目，但是主要考验的是我们对shellcode的编写以及对fastbin机制的了解，考验用这道题来正式入门堆方面的题目。 程序分析首先通过checksec分析发现，程序是一个64位程序，开启了canary和pie，但是并没有开NX保护，这就为我们在堆中写入shellcode提供了便利然后使用ida简单分析一下程序，发现只实现了添加和删除功能分析了添加之后，发">
+<meta property="og:description" content="前言这是攻防世界上的一道算是一道堆方向的题目，但是主要考验的是我们对shellcode的编写以及对fastbin机制的了解，考验用这道题来正式入门堆方面的题目。">
 <meta property="og:locale" content="default">
 <meta property="og:image" content="http://yoursite.com/img/services2/1.jpg">
 <meta property="og:image" content="http://yoursite.com/img/services2/2.jpg">
 <meta property="og:image" content="http://yoursite.com/img/services2/3.jpg">
-<meta property="og:updated_time" content="2020-01-31T07:01:27.471Z">
+<meta property="og:updated_time" content="2020-01-31T07:08:52.778Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="攻防世界PWN之note-service2">
-<meta name="twitter:description" content="前言这是攻防世界上的一道算是一道堆方向的题目，但是主要考验的是我们对shellcode的编写以及对fastbin机制的了解，考验用这道题来正式入门堆方面的题目。 程序分析首先通过checksec分析发现，程序是一个64位程序，开启了canary和pie，但是并没有开NX保护，这就为我们在堆中写入shellcode提供了便利然后使用ida简单分析一下程序，发现只实现了添加和删除功能分析了添加之后，发">
+<meta name="twitter:description" content="前言这是攻防世界上的一道算是一道堆方向的题目，但是主要考验的是我们对shellcode的编写以及对fastbin机制的了解，考验用这道题来正式入门堆方面的题目。">
 <meta name="twitter:image" content="http://yoursite.com/img/services2/1.jpg">
 
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -303,6 +303,8 @@
       
           
         <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>这是攻防世界上的一道算是一道堆方向的题目，但是主要考验的是我们对shellcode的编写以及对fastbin机制的了解，考验用这道题<br>来正式入门堆方面的题目。</p>
+<a id="more"></a>
+
 <h2 id="程序分析"><a href="#程序分析" class="headerlink" title="程序分析"></a>程序分析</h2><p>首先通过checksec分析发现，程序是一个64位程序，开启了canary和pie，但是并没有开NX保护，这就为我们在堆中写入shellcode<br>提供了便利<br>然后使用ida简单分析一下程序，发现只实现了添加和删除功能<br><img src="/img/services2/1.jpg" alt="avatar"><br>分析了添加之后，发现两个问题<br>1:最多创建大小为8字节的堆<br>2:保存堆指针的数组存在下标越界</p>
 <p>既然存在下标越界的问题，我们就可以把任意地方的8字节数据改写成堆的地址指针。即我们可以利用数组越界，把一些函数的GOT表<br>地址修改为堆指针。这就需要我们在堆上来布置shellcode了。</p>
 <p>但是由于我们程序限制了每一个堆的大小最多为8个字节，且最多保存下7字节的数据<br><img src="/img/services2/2.jpg" alt="avatar"><br>但我们的shellcode最少也需要十几字节，这就需要我们将自己的shellcode分别创建在几个堆中，然后利用jmp short xxx指令，<br>来让他跳到下一个堆中去执行<br>这里经过查阅资料发现，jmp short xxx指令一共占两个字节，且使用的是相对当前代码位置寻址，且计算公式为<br><strong>xxx = 目标地址 - 当前地址 - 2</strong></p>
@@ -325,7 +327,7 @@
         <p><span>本文标题:</span><a href="/2020/01/23/攻防世界PWN之note-service2/">攻防世界PWN之note-service2</a></p>
         <p><span>文章作者:</span><a href="/" title="回到主页">HeZhaochen</a></p>
         <p><span>发布时间:</span>2020-01-23, 22:15:59</p>
-        <p><span>最后更新:</span>2020-01-31, 15:01:27</p>
+        <p><span>最后更新:</span>2020-01-31, 15:08:52</p>
         <p>
             <span>原始链接:</span><a class="post-url" href="/2020/01/23/攻防世界PWN之note-service2/" title="攻防世界PWN之note-service2">http://yoursite.com/2020/01/23/攻防世界PWN之note-service2/</a>
             <span class="copy-path" data-clipboard-text="原文: http://yoursite.com/2020/01/23/攻防世界PWN之note-service2/　　作者: HeZhaochen" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
