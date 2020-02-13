@@ -23,7 +23,7 @@
 <meta property="og:site_name" content="good good study,day day up!">
 <meta property="og:description" content="前言又是强撸堆的一天，这道题是wiki上看到的一道unlink基础题，希望通过这一题可以让自己初步理解unlink机制。还有。。。。。还想出门啊！">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2020-02-13T09:42:27.040Z">
+<meta property="og:updated_time" content="2020-02-13T09:44:33.745Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="2014 HITCON CTF-stkof">
 <meta name="twitter:description" content="前言又是强撸堆的一天，这道题是wiki上看到的一道unlink基础题，希望通过这一题可以让自己初步理解unlink机制。还有。。。。。还想出门啊！">
@@ -322,10 +322,10 @@
 
 <p>在有了这个检查之后，我们在上面进行的修GOT表的操作明显就不可行了。但是我们还是可以通过伪造的方式来进行绕过</p>
 <p>首先我们通过覆写，将nextchunk的FD写成fakeFD，将nextchunk的BK写成fakeBK。我们为了通过验证，需要进行如下设置:</p>
-<p>fakeFD -&gt;bk = P &lt;==&gt; &amp;#42(fakeFD+12) == P<br>fakeBK -&gt;fd = P &lt;==&gt; &amp;#42(fakeBK+8) == P</p>
+<p>fakeFD -&gt;bk = P &lt;==&gt; &#42;(fakeFD+12) == P<br>fakeBK -&gt;fd = P &lt;==&gt; &#42;(fakeBK+8) == P</p>
 <p>当满足如上设置之后，我们就会进入unlink环节</p>
-<p>fakeFD -&gt; bk = fakeBK &lt;==&gt; &amp;#42(fakeFD+12) == P<br>fakeBK -&gt; fd = fakeFD &lt;==&gt; &amp;#42(fakebk+8) == P</p>
-<p>那么假如我们让fakeFD+12和fakeBK+8指向同一个指向P的指针<br>&amp;#42P = P-8</p>
+<p>fakeFD -&gt; bk = fakeBK &lt;==&gt; &#42;(fakeFD+12) == P<br>fakeBK -&gt; fd = fakeFD &lt;==&gt; &#42;(fakebk+8) == P</p>
+<p>那么假如我们让fakeFD+12和fakeBK+8指向同一个指向P的指针<br>&#42;P = P-8</p>
 
       
     </div>
@@ -337,7 +337,7 @@
         <p><span>本文标题:</span><a href="/2020/02/05/2014-HITCON-CTF-stkof/">2014 HITCON CTF-stkof</a></p>
         <p><span>文章作者:</span><a href="/" title="回到主页">HeZhaochen</a></p>
         <p><span>发布时间:</span>2020-02-05, 12:42:50</p>
-        <p><span>最后更新:</span>2020-02-13, 17:42:27</p>
+        <p><span>最后更新:</span>2020-02-13, 17:44:33</p>
         <p>
             <span>原始链接:</span><a class="post-url" href="/2020/02/05/2014-HITCON-CTF-stkof/" title="2014 HITCON CTF-stkof">http://yoursite.com/2020/02/05/2014-HITCON-CTF-stkof/</a>
             <span class="copy-path" data-clipboard-text="原文: http://yoursite.com/2020/02/05/2014-HITCON-CTF-stkof/　　作者: HeZhaochen" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
