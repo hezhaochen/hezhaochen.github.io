@@ -35,7 +35,7 @@
 <meta property="og:image" content="http://yoursite.com/img/noleak/10.jpg">
 <meta property="og:image" content="http://yoursite.com/img/noleak/11.jpg">
 <meta property="og:image" content="http://yoursite.com/img/noleak/12.jpg">
-<meta property="og:updated_time" content="2020-02-26T16:52:58.909Z">
+<meta property="og:updated_time" content="2020-02-27T01:53:39.440Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="攻防世界-Noleak">
 <meta name="twitter:description" content="为了搞懂这道题目我真的是使出了自己的毕生所学了，感觉自己学过的知识点已经用上了一大半了，不过这道题是真的很有趣。学习完赶紧来记录一下用到的知识点，也算是重新巩固一下。">
@@ -318,9 +318,9 @@
 <p><img src="/img/noleak/2.jpg" alt="avatar"><br>这里看到程序逻辑还是很简单的，一个很常见的堆上存取数据的程序</p>
 <p><img src="/img/noleak/3.jpg" alt="avatar"><br><img src="/img/noleak/4.jpg" alt="avatar"><br><img src="/img/noleak/5.jpg" alt="avatar"><br>经过分析我们发现程序有以下功能<br>1.create 这里就是一个创建指定大小的堆空间，并且向其中写入我们的数据的操作，其中我们创建的堆的地址存储在buf里<br>2.edit 这个功能里面我们发现他没有对数据长度进行限制，因此我们就能利用这个漏洞来进行堆溢出，以此构造出unlink来进行<br>任意地址写<br>3.delete  这里程序在free了指定堆后没有将其中内容清除，因此存在一个UAF漏洞</p>
 <h2 id="利用思路"><a href="#利用思路" class="headerlink" title="利用思路"></a>利用思路</h2><p>经过以上的分析，程序可以利用的漏洞已经基本被我们发现了，所以接下来就是我们如何对漏洞进行利用了<br>由于程序打开了RELRO保护，因此我们不能直接修改got表，同时由于没有输出函数，我们也不能对程序地址进行泄露。但是我们发现<br>这个程序关闭了nx保护，这就为我们执行shellcode提供了可乘之机。这里我们的思路就是将shellcode保存在bss段上，然后想办法<br>让程序执行bss段上的shellcode。</p>
-<p>说到上面的思路，就要介绍一下我最近学的新知识了<br>利用<strong>malloc_hook大致就是只要把它赋值为某个函数的地址，当我们再次执行malloc函数的时候，就会调用我们赋值的那个函数<br>因此我们的思路就是把</strong>malloc_hook赋值为bss段的地址，这样当我们再次执行malloc时，我们就能够拿到shell</p>
-<p>当然，想要做到对<strong>malloc_hook的赋值也不是那么容易的，我们需要做到申请到他的地址，然后往其中赋值。想要做到这一点，我们<br>就需要利用到unsorted bin的攻击以及partial write的相关知识了<br>经过学习我们知道，当我们free一个unsorted大小的堆时，如果这个堆处在unsorted bin的第一个chunk或者最后一个chunk时，其<br>fd和bk都是指向main_arena+88这个地址的<br><img src="/img/noleak/6.jpg" alt="avatar"><br>这里我们看到这个堆的fd和bk都指向了main_arena+88这个位置，同时我们再往上看<br><img src="/img/noleak/7.jpg" alt="avatar"><br>我们发现在main_arena上面就是我们需要的</strong>malloc_hook的地址，那如果我们利用uaf漏洞将这个fd修改到<strong>malloc_hook<br>之上的一个合适的地址，我们是不是就能利用fastbin attack来申请到地址来修改_malloc_hook的值<br>经过学习我们发现在</strong>malloc_hook-0x23这个地址上，其结构是这样的<br><img src="/img/noleak/8.jpg" alt="avatar"><br>当我们把这个地址利用漏洞给加进fastbin时，我们再次申请堆的时候，我们就能以0x7f为大小申请出这个堆，这样，我们就能够<br>对malloc_hook进行赋值了，也就能够执行shellcode拿到shell</p>
-<p>这里需要注意程序没有开启pie保护，又由于程序的页载入机制的缺陷，地址的随机是只能够影响到单个内存页的，也就是0x1000大小<br>，因此程序不管加载几次，main_arena和malloc_hook的地址的后三位都是不变的，所以我们其实只需要爆破出地址的第四位就能够<br>实现正确的覆写，而不用泄露出整个地址。这里用到的就是<em>partial wrote</em>技术了。我们已经了解了我们需要将chunk的fd修改为我<br>们malloc_hook-0x23，同时也知道了main_arena+0x88的后三位是B78,malloc_hook的后三位是B10,所以其实只需要将第四位写成<br>一个固定的数，然后多运行几次就能够成功了。</p>
+<p>说到上面的思路，就要介绍一下我最近学的新知识了<br>利用malloc_hook大致就是只要把它赋值为某个函数的地址，当我们再次执行malloc函数的时候，就会调用我们赋值的那个函数<br>因此我们的思路就是把malloc_hook赋值为bss段的地址，这样当我们再次执行malloc时，我们就能够拿到shell</p>
+<p>当然，想要做到对malloc_hook的赋值也不是那么容易的，我们需要做到申请到他的地址，然后往其中赋值。想要做到这一点，我们<br>就需要利用到unsorted bin的攻击以及partial write的相关知识了<br>经过学习我们知道，当我们free一个unsorted大小的堆时，如果这个堆处在unsorted bin的第一个chunk或者最后一个chunk时，其fd和bk都是指向main_arena+88这个地址的<br><img src="/img/noleak/6.jpg" alt="avatar"><br>这里我们看到这个堆的fd和bk都指向了main_arena+88这个位置，同时我们再往上看<br><img src="/img/noleak/7.jpg" alt="avatar"><br>我们发现在main_arena上面就是我们需要的malloc_hook的地址，那如果我们利用uaf漏洞将这个fd修改到malloc_hook<br>之上的一个合适的地址，我们是不是就能利用fastbin attack来申请到地址来修改malloc_hook的值<br>经过学习我们发现在malloc_hook-0x23这个地址上，其结构是这样的<br><img src="/img/noleak/8.jpg" alt="avatar"><br>当我们把这个地址利用漏洞给加进fastbin时，我们再次申请堆的时候，我们就能以0x7f为大小申请出这个堆，这样，我们就能够<br>对malloc_hook进行赋值了，也就能够执行shellcode拿到shell</p>
+<p>这里需要注意程序没有开启pie保护，又由于程序的页载入机制的缺陷，地址的随机是只能够影响到单个内存页的，也就是0x1000大<br>小，因此程序不管加载几次，main_arena和malloc_hook的地址的后三位都是不变的，所以我们其实只需要爆破出地址的第四位就<br>能够实现正确的覆写，而不用泄露出整个地址。这里用到的就是<em>partial wrote</em>技术了。我们已经了解了我们需要将chunk的fd修改<br>为我们malloc_hook-0x23，同时也知道了main_arena+0x88的后三位是B78,malloc_hook的后三位是B10,所以其实只需要将第四<br>位写成一个固定的数，然后多运行几次就能够成功了。</p>
 <p>下面我们看具体的实现过程吧</p>
 <h2 id="漏洞利用"><a href="#漏洞利用" class="headerlink" title="漏洞利用"></a>漏洞利用</h2><p>首先是构造出unlink来实现任意地址写</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">ptr = 0x601040</span><br><span class="line">create(0x100,&apos;a&apos;*0x100)</span><br><span class="line">create(0x100,&apos;b&apos;*0x100)</span><br><span class="line">payload = p64(0)+p64(0x101)</span><br><span class="line">payload += p64(ptr-0x18)+p64(ptr-0x10)   #fakefd and fakebk</span><br><span class="line">payload += &apos;a&apos;*(0x100-0x20)</span><br><span class="line">paylaod += p64(0x100)+p64(0x110)   #make it believe that prve chunk is free</span><br><span class="line">edit(0,len(payload),payload)  #chunk overflow</span><br><span class="line">delete(1)  #unlink</span><br></pre></td></tr></table></figure>
@@ -356,7 +356,7 @@
         <p><span>本文标题:</span><a href="/2020/02/26/攻防世界-Noleak/">攻防世界-Noleak</a></p>
         <p><span>文章作者:</span><a href="/" title="回到主页">HeZhaochen</a></p>
         <p><span>发布时间:</span>2020-02-26, 13:27:36</p>
-        <p><span>最后更新:</span>2020-02-27, 00:52:58</p>
+        <p><span>最后更新:</span>2020-02-27, 09:53:39</p>
         <p>
             <span>原始链接:</span><a class="post-url" href="/2020/02/26/攻防世界-Noleak/" title="攻防世界-Noleak">http://yoursite.com/2020/02/26/攻防世界-Noleak/</a>
             <span class="copy-path" data-clipboard-text="原文: http://yoursite.com/2020/02/26/攻防世界-Noleak/　　作者: HeZhaochen" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
