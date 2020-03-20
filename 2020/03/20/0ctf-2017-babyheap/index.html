@@ -15,18 +15,14 @@
 
 
 
-<meta name="description" content="初学堆的漏洞利用，就从最简单的Use After Free来学习吧！">
-<meta name="keywords" content="heap">
 <meta property="og:type" content="article">
-<meta property="og:title" content="use after free的学习">
-<meta property="og:url" content="http://yoursite.com/2019/07/31/use-after-free的学习/index.html">
+<meta property="og:title" content="0ctf-2017-babyheap">
+<meta property="og:url" content="http://yoursite.com/2020/03/20/0ctf-2017-babyheap/index.html">
 <meta property="og:site_name" content="good good study,day day up!">
-<meta property="og:description" content="初学堆的漏洞利用，就从最简单的Use After Free来学习吧！">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-08-19T12:44:40.199Z">
+<meta property="og:updated_time" content="2020-03-20T12:50:58.695Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="use after free的学习">
-<meta name="twitter:description" content="初学堆的漏洞利用，就从最简单的Use After Free来学习吧！">
+<meta name="twitter:title" content="0ctf-2017-babyheap">
 
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
@@ -58,7 +54,7 @@
 <link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
 
 
-<title>use after free的学习 | good good study,day day up!</title>
+<title>0ctf-2017-babyheap | good good study,day day up!</title>
 
 <script src="//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
 <script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
@@ -258,11 +254,11 @@
     </div>
     <link class="menu-list" tags="标签" friends="友情链接" about="关于我"/>
 </nav>
-      <div class="body-wrap"><article id="post-use-after-free的学习" class="article article-type-post" itemscope itemprop="blogPost">
+      <div class="body-wrap"><article id="post-0ctf-2017-babyheap" class="article article-type-post" itemscope itemprop="blogPost">
   
     <div class="article-meta">
-      <a href="/2019/07/31/use-after-free的学习/" class="article-date">
-      <time datetime="2019-07-31T10:51:05.000Z" itemprop="datePublished">2019-07-31</time>
+      <a href="/2020/03/20/0ctf-2017-babyheap/" class="article-date">
+      <time datetime="2020-03-20T12:50:58.000Z" itemprop="datePublished">2020-03-20</time>
 </a>
 
 
@@ -277,7 +273,7 @@
         
   
     <h1 class="article-title" itemprop="name">
-      use after free的学习
+      0ctf-2017-babyheap
     </h1>
   
 
@@ -287,10 +283,6 @@
         
 
         
-    <div class="article-tag tagcloud">
-        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/heap/">heap</a></li></ul>
-    </div>
-
         <div class="clearfix"></div>
       </div>
       
@@ -298,19 +290,7 @@
     <div class="article-entry" itemprop="articleBody">
       
           
-        <p>初学堆的漏洞利用，就从最简单的Use After Free来学习吧！</p>
-<a id="more"></a>
-
-<h2 id="简单介绍"><a href="#简单介绍" class="headerlink" title="简单介绍"></a>简单介绍</h2><p>其实uaf漏洞的利用跟chunk，bin等heap的内部操作没有什么关系<br>让程序有两个指针指向同一个记忆体</p>
-<ul>
-<li>一个是structure，另一块用作data buffer</li>
-<li>利用对buffer的读写，修改或泄露structure的内容</li>
-</ul>
-<p>总的来说就是利用chunk的回收特性<br>所谓use after free,是指free(=p)掉后还继续使用它</p>
-<ul>
-<li>例：linked list remove掉物件后，忘了把指向它的指针清为NULL，导致以为该物件还存在list当中。</li>
-</ul>
-
+        
       
     </div>
     
@@ -318,13 +298,13 @@
   
     
     <div class="copyright">
-        <p><span>本文标题:</span><a href="/2019/07/31/use-after-free的学习/">use after free的学习</a></p>
+        <p><span>本文标题:</span><a href="/2020/03/20/0ctf-2017-babyheap/">0ctf-2017-babyheap</a></p>
         <p><span>文章作者:</span><a href="/" title="回到主页">HeZhaochen</a></p>
-        <p><span>发布时间:</span>2019-07-31, 18:51:05</p>
-        <p><span>最后更新:</span>2019-08-19, 20:44:40</p>
+        <p><span>发布时间:</span>2020-03-20, 20:50:58</p>
+        <p><span>最后更新:</span>2020-03-20, 20:50:58</p>
         <p>
-            <span>原始链接:</span><a class="post-url" href="/2019/07/31/use-after-free的学习/" title="use after free的学习">http://yoursite.com/2019/07/31/use-after-free的学习/</a>
-            <span class="copy-path" data-clipboard-text="原文: http://yoursite.com/2019/07/31/use-after-free的学习/　　作者: HeZhaochen" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
+            <span>原始链接:</span><a class="post-url" href="/2020/03/20/0ctf-2017-babyheap/" title="0ctf-2017-babyheap">http://yoursite.com/2020/03/20/0ctf-2017-babyheap/</a>
+            <span class="copy-path" data-clipboard-text="原文: http://yoursite.com/2020/03/20/0ctf-2017-babyheap/　　作者: HeZhaochen" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
             <script> var clipboard = new Clipboard('.copy-path'); </script>
         </p>
         <p>
@@ -336,16 +316,10 @@
 
     <nav id="article-nav">
         
-            <div id="article-nav-newer" class="article-nav-title">
-                <a href="/2019/09/10/初次学习RSA密码/">
-                    初次学习RSA密码
-                </a>
-            </div>
-        
         
             <div id="article-nav-older" class="article-nav-title">
-                <a href="/2019/07/27/使用LibcSearcher解题/">
-                    使用LibcSearcher解题
+                <a href="/2020/03/15/高校抗疫-easyheap/">
+                    高校抗疫-easyheap
                 </a>
             </div>
         
@@ -357,7 +331,7 @@
     <div id="toc" class="toc-article">
         <strong class="toc-title">文章目录</strong>
         
-            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#简单介绍"><span class="toc-number">1.</span> <span class="toc-text">简单介绍</span></a></li></ol>
+            
         
     </div>
     <style>
@@ -393,7 +367,7 @@
         </div>
         <script>
             window._bd_share_config={
-                "common":{"bdSnsKey":{},"bdText":"use after free的学习　| good good study,day day up!　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+                "common":{"bdSnsKey":{},"bdText":"0ctf-2017-babyheap　| good good study,day day up!　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
         </script>
     
 
@@ -413,15 +387,13 @@
 
     <div class="scroll" id="post-nav-button">
         
-            <a href="/2019/09/10/初次学习RSA密码/" title="上一篇: 初次学习RSA密码">
-                <i class="fa fa-angle-left"></i>
-            </a>
+            <a href="/" title="回到主页"><i class="fa fa-home"></i></a>
         
 
         <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
 
         
-            <a href="/2019/07/27/使用LibcSearcher解题/" title="下一篇: 使用LibcSearcher解题">
+            <a href="/2020/03/15/高校抗疫-easyheap/" title="下一篇: 高校抗疫-easyheap">
                 <i class="fa fa-angle-right"></i>
             </a>
         
