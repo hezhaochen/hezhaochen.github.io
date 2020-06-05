@@ -27,7 +27,7 @@
 <meta property="og:image" content="http://yoursite.com/img/echo_back/1.jpg">
 <meta property="og:image" content="http://yoursite.com/img/echo_back/3.jpg">
 <meta property="og:image" content="http://yoursite.com/img/echo_back/4.jpg">
-<meta property="og:updated_time" content="2020-06-05T06:51:41.897Z">
+<meta property="og:updated_time" content="2020-06-05T06:54:34.711Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="攻防世界-echo_back-IO_FILE结构体初探">
 <meta name="twitter:description" content="前言最近在攻防世界里刷到了echo_back这道题，本来以为这可能是一道格式化字符串的题，但是研究之后发现只能输入7个字符，所以传统的格式化字符串漏洞就无法进行利用。在看了其他大师傅的wp之后才知道了要对IO_FILE_stdin结构体指针进行攻击，所以学习之后在这里做一个记录。">
@@ -306,7 +306,7 @@
         <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>最近在攻防世界里刷到了echo_back这道题，本来以为这可能是一道格式化字符串的题，但是研究之后发现只能输入7个字符，所以传统的格式化<br>字符串漏洞就无法进行利用。在看了其他大师傅的wp之后才知道了要对IO_FILE_stdin结构体指针进行攻击，所以学习之后在这里做一个记录。</p>
 <a id="more"></a>
 
-<p>##程序分析<br><img src="/img/echo_back/2.jpg" alt="avatar"><br>checksec发现这是一个64位保护全开的程序，就有点头痛。</p>
+<h2 id="程序分析"><a href="#程序分析" class="headerlink" title="程序分析"></a>程序分析</h2><p><img src="/img/echo_back/2.jpg" alt="avatar"><br>checksec发现这是一个64位保护全开的程序，就有点头痛。</p>
 <p><img src="/img/echo_back/1.jpg" alt="avatar"></p>
 <p><img src="/img/echo_back/3.jpg" alt="avatar"><br>ida反编译后发现程序的逻辑还是比较简单的，大致上只有两个功能，一个是输入name，一个就是格式化字符串所在的echo_back函数、</p>
 <h2 id="漏洞利用"><a href="#漏洞利用" class="headerlink" title="漏洞利用"></a>漏洞利用</h2><p>由于能够重复输入，我们首先就能够利用格式化字符串漏洞来泄露libc地址和程序基址，这里就不进行赘述了。经过我们的调试，我们可以使用<br><em>%19$p*来泄露出Libc_start_main+240的地址，然后就能够计算出我们所需要的libc地址了。同样的，我们可以利用</em>%13$p*来泄露程序基址，<br>但其实在这道题目中并不需要知道程序基址。</p>
@@ -339,7 +339,7 @@
         <p><span>本文标题:</span><a href="/2020/05/29/攻防世界-echo-back-IO-FILE结构体初探/">攻防世界-echo_back-IO_FILE结构体初探</a></p>
         <p><span>文章作者:</span><a href="/" title="回到主页">HeZhaochen</a></p>
         <p><span>发布时间:</span>2020-05-29, 18:40:40</p>
-        <p><span>最后更新:</span>2020-06-05, 14:51:41</p>
+        <p><span>最后更新:</span>2020-06-05, 14:54:34</p>
         <p>
             <span>原始链接:</span><a class="post-url" href="/2020/05/29/攻防世界-echo-back-IO-FILE结构体初探/" title="攻防世界-echo_back-IO_FILE结构体初探">http://yoursite.com/2020/05/29/攻防世界-echo-back-IO-FILE结构体初探/</a>
             <span class="copy-path" data-clipboard-text="原文: http://yoursite.com/2020/05/29/攻防世界-echo-back-IO-FILE结构体初探/　　作者: HeZhaochen" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
@@ -369,7 +369,7 @@
     <div id="toc" class="toc-article">
         <strong class="toc-title">文章目录</strong>
         
-            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#漏洞利用"><span class="toc-number">2.</span> <span class="toc-text">漏洞利用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#exp"><span class="toc-number">3.</span> <span class="toc-text">exp</span></a></li></ol>
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#程序分析"><span class="toc-number">2.</span> <span class="toc-text">程序分析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#漏洞利用"><span class="toc-number">3.</span> <span class="toc-text">漏洞利用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#exp"><span class="toc-number">4.</span> <span class="toc-text">exp</span></a></li></ol>
         
     </div>
     <style>
